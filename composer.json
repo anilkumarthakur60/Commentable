@@ -1,0 +1,34 @@
+{
+    "name": "anil/comments",
+    "type": "library",
+    "require": {
+        "erusev/parsedown": "^1.7",
+        "illuminate/database": "^10.8",
+        "illuminate/http": "^10.8",
+        "illuminate/pagination": "^10.8",
+        "illuminate/routing": "^10.8",
+        "illuminate/queue": "^10.8",
+        "illuminate/support": "^10.8",
+        "spatie/laravel-honeypot": "^4.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Anil\\Comments\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anil",
+            "email": "anilkumarthakur60@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Anil\\Comments\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable"
+}
