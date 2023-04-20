@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b66e52b4-8333-4cc1-956a-4dded834d564" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../app/Exceptions/Handler.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/Exceptions/Handler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/Http/Controllers/PostControllerCrud.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/Http/Controllers/PostControllerCrud.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/Http/Kernel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/Models/Post.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/Models/Post.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/Models/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../../composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../config/app.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ExceptionResponse/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ExceptionResponse/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ExceptionResponse/src/Traits/ApiExceptionResponse.php" beforeDir="false" afterPath="$PROJECT_DIR$/../ExceptionResponse/src/Traits/ApiExceptionResponse.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ExceptionResponse/vendor/composer/autoload_classmap.php" beforeDir="false" afterPath="$PROJECT_DIR$/../ExceptionResponse/vendor/composer/autoload_classmap.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ExceptionResponse/vendor/composer/autoload_static.php" beforeDir="false" afterPath="$PROJECT_DIR$/../ExceptionResponse/vendor/composer/autoload_static.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ExceptionResponse/migrations/2018_06_30_113500_create_comments_table.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../FastApiCrud" beforeDir="false" afterPath="$PROJECT_DIR$/../FastApiCrud" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/../../resources/views/welcome.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +18,7 @@
     <execution />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/bin/php">
     <include_path>
@@ -111,7 +99,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "master",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -128,6 +116,7 @@
       <option name="presentableId" value="Default" />
       <updated>1681883744620</updated>
       <workItem from="1681883746482" duration="383000" />
+      <workItem from="1681965938659" duration="71000" />
     </task>
     <servers />
   </component>
