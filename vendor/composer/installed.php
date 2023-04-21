@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'ced5554839361317db6637018be8a775a6ea03d4',
+        'reference' => 'aa09cd4f4fc60f5640a97f23329c36ac9358e909',
         'name' => 'anil/comments',
         'dev' => true,
     ),
     'versions' => array(
         'anil/comments' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'ced5554839361317db6637018be8a775a6ea03d4',
+            'reference' => 'aa09cd4f4fc60f5640a97f23329c36ac9358e909',
             'dev_requirement' => false,
         ),
         'brick/math' => array(

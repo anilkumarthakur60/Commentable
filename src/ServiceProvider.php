@@ -4,11 +4,11 @@ namespace Anil\Comments;
 
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -20,7 +20,7 @@ class ServiceProvider extends LaravelServiceProvider
     protected function loadRoutes()
     {
         if (Config::get('comments.routes') === true) {
-            $this->loadRoutesFrom(__DIR__ . '/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/routes.php');
         }
     }
 
@@ -32,7 +32,7 @@ class ServiceProvider extends LaravelServiceProvider
     protected function loadMigrations()
     {
         if (Config::get('comments.load_migrations') === true) {
-            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../migrations');
         }
     }
 
@@ -60,28 +60,28 @@ class ServiceProvider extends LaravelServiceProvider
 
         $this->loadMigrations();
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'comments');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'comments');
 
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'comments');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'comments');
 
         $this->includeBladeComponent();
 
         $this->definePermissions();
 
         $this->publishes([
-            __DIR__ . '/../migrations/' => App::databasePath('migrations')
+            __DIR__.'/../migrations/' => App::databasePath('migrations'),
         ], 'migrations');
 
         $this->publishes([
-            __DIR__ . '/../resources/views' => App::resourcePath('views/vendor/comments'),
+            __DIR__.'/../resources/views' => App::resourcePath('views/vendor/comments'),
         ], 'views');
 
         $this->publishes([
-            __DIR__ . '/../config/comments.php' => App::configPath('comments.php'),
+            __DIR__.'/../config/comments.php' => App::configPath('comments.php'),
         ], 'config');
 
         $this->publishes([
-            __DIR__ . '/../resources/lang' => App::resourcePath('lang/vendor/comments'),
+            __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
         ], 'translations');
 
         Route::model('comment', Config::get('comments.model'));
@@ -94,7 +94,7 @@ class ServiceProvider extends LaravelServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/comments.php',
+            __DIR__.'/../config/comments.php',
             'comments'
         );
     }

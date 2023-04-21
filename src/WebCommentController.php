@@ -25,7 +25,7 @@ class WebCommentController extends CommentController
     {
         $comment = $this->commentService->store($request);
 
-        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey());
+        return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
     }
 
     /**
@@ -35,7 +35,7 @@ class WebCommentController extends CommentController
     {
         $comment = $this->commentService->update($request, $comment);
 
-        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey());
+        return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
     }
 
     /**
@@ -55,6 +55,6 @@ class WebCommentController extends CommentController
     {
         $reply = $this->commentService->reply($request, $comment);
 
-        return Redirect::to(URL::previous() . '#comment-' . $reply->getKey());
+        return Redirect::to(URL::previous().'#comment-'.$reply->getKey());
     }
 }

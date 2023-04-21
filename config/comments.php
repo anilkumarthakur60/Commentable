@@ -1,6 +1,5 @@
 <?php
 
-
 return [
 
     /**
@@ -15,10 +14,10 @@ return [
      * creating your own and pointing to it here.
      */
     'permissions' => [
-        'create-comment' => [\Anil\Comments\CommentPolicy::class,'create'],
-        'delete-comment' => [\Anil\Comments\CommentPolicy::class,'delete'],
-        'edit-comment' => [\Anil\Comments\CommentPolicy::class,'update'],
-        'reply-to-comment' => [\Anil\Comments\CommentPolicy::class,'reply'],
+        'create-comment' => [\Anil\Comments\CommentPolicy::class, 'create'],
+        'delete-comment' => [\Anil\Comments\CommentPolicy::class, 'delete'],
+        'edit-comment' => [\Anil\Comments\CommentPolicy::class, 'update'],
+        'reply-to-comment' => [\Anil\Comments\CommentPolicy::class, 'reply'],
     ],
 
     /**
@@ -49,7 +48,6 @@ return [
      *         'model' => $book,
      *         'approved' => true
      *     ])
-     *
      */
     'approval_required' => false,
 

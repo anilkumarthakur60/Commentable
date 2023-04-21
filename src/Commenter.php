@@ -2,9 +2,9 @@
 
 namespace Anil\Comments;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Add this trait to your User model so
@@ -15,7 +15,7 @@ trait Commenter
     /**
      * Returns all comments that this user has made.
      */
-    public function comments():MorphMany
+    public function comments(): MorphMany
     {
         return $this->morphMany(Config::get('comments.model'), 'commenter');
     }
@@ -31,12 +31,12 @@ trait Commenter
     /**
      * Returns only approved comments that this user has made.
      */
-
     public function scopeApprovedComments(Builder $builder, bool $approved = false)
     {
-        if (!is_bool($approved)) {
-            return  $builder->comments();
+        if (! is_bool($approved)) {
+            return $builder->comments();
         }
+
         return $builder->comments()->where('approved', $approved);
     }
 }

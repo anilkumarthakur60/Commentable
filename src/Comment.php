@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Anil\Comments;
 
 use Anil\Comments\Events\CommentCreated;
@@ -23,7 +22,7 @@ class Comment extends Model
      * @var array
      */
     protected $with = [
-        'commenter'
+        'commenter',
     ];
 
     /**
@@ -32,7 +31,7 @@ class Comment extends Model
      * @var array
      */
     protected $fillable = [
-        'comment', 'approved', 'guest_name', 'guest_email'
+        'comment', 'approved', 'guest_name', 'guest_email',
     ];
 
     /**
@@ -41,7 +40,7 @@ class Comment extends Model
      * @var array
      */
     protected $casts = [
-        'approved' => 'boolean'
+        'approved' => 'boolean',
     ];
 
     /**
@@ -58,7 +57,7 @@ class Comment extends Model
     /**
      * The user who posted the comment.
      */
-    public function commenter():MorphTo
+    public function commenter(): MorphTo
     {
         return $this->morphTo();
     }
@@ -66,7 +65,7 @@ class Comment extends Model
     /**
      * The model that was commented upon.
      */
-    public function commentable():MorphTo
+    public function commentable(): MorphTo
     {
         return $this->morphTo();
     }
@@ -74,7 +73,7 @@ class Comment extends Model
     /**
      * Returns all comments that this comment is the parent of.
      */
-    public function children():HasMany
+    public function children(): HasMany
     {
         return $this->hasMany(Config::get('comments.model'), 'child_id');
     }
@@ -82,7 +81,7 @@ class Comment extends Model
     /**
      * Returns the comment to which this comment belongs to.
      */
-    public function parent():BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Config::get('comments.model'), 'child_id');
     }
