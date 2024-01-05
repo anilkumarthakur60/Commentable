@@ -140,11 +140,16 @@ trait ConditionallyLoadsAttributes
      *
      * @param  bool  $condition
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
-    protected function mergeWhen($condition, $value)
+    protected function mergeWhen($condition, $value, $default = null)
     {
-        return $condition ? new MergeValue(value($value)) : new MissingValue;
+        if ($condition) {
+            return new MergeValue(value($value));
+        }
+
+        return func_num_args() === 3 ? new MergeValue(value($default)) : new MissingValue();
     }
 
     /**
@@ -152,11 +157,14 @@ trait ConditionallyLoadsAttributes
      *
      * @param  bool  $condition
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
-    protected function mergeUnless($condition, $value)
+    protected function mergeUnless($condition, $value, $default = null)
     {
-        return ! $condition ? new MergeValue(value($value)) : new MissingValue;
+        $arguments = func_num_args() === 2 ? [$value] : [$value, $default];
+
+        return $this->mergeWhen(! $condition, ...$arguments);
     }
 
     /**
@@ -290,6 +298,35 @@ trait ConditionallyLoadsAttributes
         }
 
         if (func_num_args() === 1) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        return value($value, $this->resource->{$attribute});
+    }
+
+    /**
+     * Retrieve a relationship aggregated value if it exists.
+     *
+     * @param  string  $relationship
+     * @param  string  $column
+     * @param  string  $aggregate
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenAggregated($relationship, $column, $aggregate, $value = null, $default = null)
+    {
+        $attribute = (string) Str::of($relationship)->snake()->append('_')->append($aggregate)->append('_')->finish($column);
+
+        if (! isset($this->resource->getAttributes()[$attribute])) {
+            return value($default);
+        }
+
+        if (func_num_args() === 3) {
             return $this->resource->{$attribute};
         }
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Dumper\ContextProvider;
 
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
@@ -44,7 +44,7 @@ final class SourceContextProvider implements ContextProviderInterface
 
         $file = $trace[1]['file'];
         $line = $trace[1]['line'];
-        $name = false;
+        $name = '-' === $file || 'Standard input code' === $file ? 'Standard input code' : false;
         $fileExcerpt = false;
 
         for ($i = 2; $i < $this->limit; ++$i) {

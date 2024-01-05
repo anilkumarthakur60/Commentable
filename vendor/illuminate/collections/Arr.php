@@ -113,13 +113,13 @@ class Arr
 
         foreach ($array as $key => $value) {
             if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results[] = static::dot($value, $prepend.$key.'.');
             } else {
-                $results[$prepend.$key] = $value;
+                $results[] = [$prepend.$key => $value];
             }
         }
 
-        return $results;
+        return array_merge(...$results);
     }
 
     /**
@@ -195,6 +195,8 @@ class Arr
             foreach ($array as $item) {
                 return $item;
             }
+
+            return value($default);
         }
 
         foreach ($array as $key => $value) {
@@ -564,6 +566,35 @@ class Arr
     }
 
     /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @template TKey
+     * @template TValue
+     * @template TMapWithKeysKey of array-key
+     * @template TMapWithKeysValue
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+     * @return array
+     */
+    public static function mapWithKeys(array $array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
@@ -768,6 +799,18 @@ class Arr
         }
 
         return $array;
+    }
+
+    /**
+     * Recursively sort an array by keys and values in descending order.
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @return array
+     */
+    public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
+    {
+        return static::sortRecursive($array, $options, true);
     }
 
     /**

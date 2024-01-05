@@ -18,7 +18,7 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class LinkStub extends ConstStub
 {
-    public $inVendor = false;
+    public bool $inVendor = false;
 
     private static array $vendorRoots;
     private static array $composerRoots = [];
@@ -60,7 +60,7 @@ class LinkStub extends ConstStub
         }
     }
 
-    private function getComposerRoot(string $file, bool &$inVendor)
+    private function getComposerRoot(string $file, bool &$inVendor): string|false
     {
         if (!isset(self::$vendorRoots)) {
             self::$vendorRoots = [];

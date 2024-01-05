@@ -1,11 +1,8 @@
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/support-ukraine.svg?t=1" />](https://supportukrainenow.org)
-
 # Preventing spam submitted through forms
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-honeypot.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-honeypot)
-![Test Status](https://img.shields.io/github/workflow/status/spatie/laravel-honeypot/run-tests?label=tests)
-![Code Style Status](https://img.shields.io/github/workflow/status/spatie/laravel-honeypot/Check%20&%20fix%20styling?label=code%20style)
+![Test Status](https://img.shields.io/github/actions/workflow/status/spatie/laravel-honeypot/run-tests.yml?branch=main&label=Tests)
+![Code Style Status](https://img.shields.io/github/actions/workflow/status/spatie/laravel-honeypot/php-cs-fixer.yml?branch=main&label=Code%20Style)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-honeypot.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-honeypot)
 
 When adding a form to a public site, there's a risk that spam bots will try to submit it with fake values. Luckily, the majority of these bots are pretty dumb. You can thwart most of them by adding an invisible field to your form that should never contain a value when submitted. Such a field is called a honeypot. These spam bots will just fill all fields, including the honeypot.
@@ -103,7 +100,7 @@ return [
      * rules for a request. By default uses `request()`.
      *
      * It throws the `Spatie\Honeypot\ExceptionsSpamException` if the
-     * request is flagged as spam, or returns void if it succeded.
+     * request is flagged as spam, or returns void if it succeeds.
      */
     'spam_protection' => \Spatie\Honeypot\SpamProtection::class,
 
@@ -260,6 +257,31 @@ Finally, use the `x-honeypot` in your Livewire Blade component:
     <x-honeypot livewire-model="extraFields" />
     <input name="myField" type="text">
 </form>
+```
+
+#### Usage in Volt functional syntax
+
+To use this package in Volt functional syntax, return the `HoneypotData` property from the `guessHoneypotDataProperty` method.
+
+```php
+uses(UsesSpamProtection::class);
+
+state([
+    // ...
+    'extraFields' => null,
+]);
+
+mount(function () {
+    $this->extraFields = new HoneypotData();
+});
+
+$guessHoneypotDataProperty = fn () => $this->extraFields;
+
+$submit = function () {
+    $this->protectAgainstSpam(); // if is spam, will abort the request
+    
+    User::create($request->all());
+};
 ```
 
 ### Disabling in testing
