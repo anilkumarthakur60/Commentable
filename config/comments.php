@@ -1,5 +1,9 @@
 <?php
 
+use Anil\Comments\Comment;
+use Anil\Comments\CommentPolicy;
+use Anil\Comments\WebCommentController;
+
 return [
 
     /**
@@ -7,17 +11,17 @@ return [
      * CustomComment model extending the Comment model shipped with the
      * package and change this configuration option to their extended model.
      */
-    'model' => \Anil\Comments\Comment::class,
+    'model' => Comment::class,
 
     /**
      * You can customize the behaviour of these permissions by
      * creating your own and pointing to it here.
      */
     'permissions' => [
-        'create-comment' => [\Anil\Comments\CommentPolicy::class, 'create'],
-        'delete-comment' => [\Anil\Comments\CommentPolicy::class, 'delete'],
-        'edit-comment' => [\Anil\Comments\CommentPolicy::class, 'update'],
-        'reply-to-comment' => [\Anil\Comments\CommentPolicy::class, 'reply'],
+        'create-comment' => [CommentPolicy::class, 'create'],
+        'delete-comment' => [CommentPolicy::class, 'delete'],
+        'edit-comment' => [CommentPolicy::class, 'update'],
+        'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
 
     /**
@@ -26,7 +30,7 @@ return [
      * You can use the \Anil\Comments\CommentControllerInterface
      * or extend the \Anil\Comments\CommentController.
      */
-    'controller' => \Anil\Comments\WebCommentController::class,
+    'controller' => WebCommentController::class,
 
     /**
      * Disable/enable the package routes.
@@ -44,7 +48,7 @@ return [
      *
      * To see only approved comments use this code in your view:
      *
-     *     @comments([
+     * @comments([
      *         'model' => $book,
      *         'approved' => true
      *     ])

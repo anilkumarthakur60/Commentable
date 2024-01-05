@@ -9,7 +9,7 @@ class CommentDeleted
 {
     use SerializesModels;
 
-    public $comment;
+    public Comment $comment;
 
     /**
      * Create a new event instance.

@@ -2,9 +2,11 @@
 
 namespace Anil\Comments;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,16 +16,17 @@ class CommentService
      * Handles creating a new comment for given model.
      *
      * @return mixed the configured comment-model
+     * @throws Exception
      */
     public function store(Request $request)
     {
         // If guest commenting is turned off, authorize this action.
-        if (Config::get('comments.guest_commenting') == false) {
+        if (!Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
         // Define guest rules if user is not logged in.
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             $guest_rules = [
                 'guest_name' => 'required|string|max:255',
                 'guest_email' => 'required|string|email|max:255',
@@ -40,27 +43,44 @@ class CommentService
         $model = $request->commentable_type::findOrFail($request->commentable_id);
 
         $commentClass = Config::get('comments.model');
-        $comment = new $commentClass;
 
-        if (! Auth::check()) {
-            $comment->guest_name = $request->guest_name;
-            $comment->guest_email = $request->guest_email;
-        } else {
-            $comment->commenter()->associate(Auth::user());
+        try {
+
+            DB::beginTransaction();
+            $comment = new $commentClass;
+
+            if (!Auth::check()) {
+                $comment->guest_name = $request->guest_name;
+                $comment->guest_email = $request->guest_email;
+            } else {
+                $comment->commenter()->associate(Auth::user());
+            }
+
+            $comment->commentable()->associate($model);
+            $comment->comment = $request->message;
+            $comment->approved = !Config::get('comments.approval_required');
+            $comment->save();
+
+            if (method_exists($comment, 'afterCreateProcess')) {
+                $model->afterCreateProcess();
+            }
+
+            DB::commit();
+            return $comment;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw new Exception($exception);
+
+
         }
 
-        $comment->commentable()->associate($model);
-        $comment->comment = $request->message;
-        $comment->approved = ! Config::get('comments.approval_required');
-        $comment->save();
-
-        return $comment;
     }
 
     /**
      * Handles updating the message of the comment.
      *
-     * @return mixed the configured comment-model
+     * @return Comment the configured comment-model
+     * @throws Exception
      */
     public function update(Request $request, Comment $comment)
     {
@@ -70,33 +90,68 @@ class CommentService
             'message' => 'required|string',
         ])->validate();
 
-        $comment->update([
-            'comment' => $request->message,
-        ]);
 
-        return $comment;
+        try {
+            DB::beginTransaction();
+            $comment->update([
+                'comment' => $request->message,
+            ]);
+
+            if (method_exists($comment, 'afterUpdateProcess')) {
+                $comment->afterUpdateProcess();
+            }
+
+            DB::commit();
+            return $comment;
+
+
+        } catch (Exception $exception) {
+            throw new Exception($exception);
+        }
+
+
     }
 
     /**
      * Handles deleting a comment.
      *
      * @return mixed the configured comment-model
+     * @throws Exception
      */
     public function destroy(Comment $comment): void
     {
         Gate::authorize('delete-comment', $comment);
 
-        if (Config::get('comments.soft_deletes') == true) {
-            $comment->delete();
-        } else {
-            $comment->forceDelete();
+
+        try {
+            DB::beginTransaction();
+            if (method_exists($comment, 'beforeDeleteProcess')) {
+                $comment->beforeDeleteProcess();
+            }
+
+            if (Config::get('comments.soft_deletes')) {
+                $comment->delete();
+            } else {
+                $comment->forceDelete();
+            }
+
+            if (method_exists($comment, 'afterDeleteProcess')) {
+                $comment->afterDeleteProcess();
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception($e);
         }
+
     }
 
     /**
      * Handles creating a reply "comment" to a comment.
      *
      * @return mixed the configured comment-model
+     * @throws Exception
      */
     public function reply(Request $request, Comment $comment)
     {
@@ -107,14 +162,28 @@ class CommentService
         ])->validate();
 
         $commentClass = Config::get('comments.model');
-        $reply = new $commentClass;
-        $reply->commenter()->associate(Auth::user());
-        $reply->commentable()->associate($comment->commentable);
-        $reply->parent()->associate($comment);
-        $reply->comment = $request->message;
-        $reply->approved = ! Config::get('comments.approval_required');
-        $reply->save();
 
-        return $reply;
+        try {
+            DB::beginTransaction();
+            $reply = new $commentClass;
+            $reply->commenter()->associate(Auth::user());
+            $reply->commentable()->associate($comment->commentable);
+            $reply->parent()->associate($comment);
+            $reply->comment = $request->message;
+            $reply->approved = !Config::get('comments.approval_required');
+            $reply->save();
+
+            if (method_exists($reply, 'afterReplyProcess')) {
+                $reply->afterCreateProcess();
+            }
+
+            DB::commit();
+            return $reply;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw new Exception($exception);
+        }
+
+
     }
 }
