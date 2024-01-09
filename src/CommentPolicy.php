@@ -5,7 +5,7 @@ namespace Anil\Comments;
 class CommentPolicy
 {
     /**
-     * Can user create the comment
+     * Can user create the comment.
      */
     public function create($user): bool
     {
@@ -13,7 +13,7 @@ class CommentPolicy
     }
 
     /**
-     * Can user delete the comment
+     * Can user delete the comment.
      */
     public function delete($user, Comment $comment): bool
     {
@@ -21,7 +21,7 @@ class CommentPolicy
     }
 
     /**
-     * Can user update the comment
+     * Can user update the comment.
      */
     public function update($user, Comment $comment): bool
     {
@@ -29,7 +29,7 @@ class CommentPolicy
     }
 
     /**
-     * Can user reply to the comment
+     * Can user reply to the comment.
      */
     public function reply($user, Comment $comment): bool
     {

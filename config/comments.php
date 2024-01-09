@@ -18,9 +18,9 @@ return [
      * creating your own and pointing to it here.
      */
     'permissions' => [
-        'create-comment' => [CommentPolicy::class, 'create'],
-        'delete-comment' => [CommentPolicy::class, 'delete'],
-        'edit-comment' => [CommentPolicy::class, 'update'],
+        'create-comment'   => [CommentPolicy::class, 'create'],
+        'delete-comment'   => [CommentPolicy::class, 'delete'],
+        'edit-comment'     => [CommentPolicy::class, 'update'],
         'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
 
