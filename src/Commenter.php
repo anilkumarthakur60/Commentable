@@ -33,7 +33,7 @@ trait Commenter
      */
     public function scopeApprovedComments(Builder $builder, bool $approved = false)
     {
-        if (! is_bool($approved)) {
+        if (!is_bool($approved)) {
             return $builder->comments();
         }
 
