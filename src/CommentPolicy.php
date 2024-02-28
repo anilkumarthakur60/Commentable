@@ -17,7 +17,7 @@ class CommentPolicy
      */
     public function delete($user, Comment $comment): bool
     {
-        return $user->getKey() == $comment->commenter_id;
+        return $user->getKey() === $comment->commenter_id;
     }
 
     /**
@@ -25,7 +25,7 @@ class CommentPolicy
      */
     public function update($user, Comment $comment): bool
     {
-        return $user->getKey() == $comment->commenter_id;
+        return $user->getKey() === $comment->commenter_id;
     }
 
     /**
@@ -33,6 +33,6 @@ class CommentPolicy
      */
     public function reply($user, Comment $comment): bool
     {
-        return $user->getKey() != $comment->commenter_id;
+        return $user->getKey() !== $comment->commenter_id;
     }
 }
