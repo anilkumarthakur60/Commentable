@@ -171,7 +171,7 @@ class CommentService
             $reply->save();
 
             if (method_exists($reply, 'afterReplyProcess')) {
-                $reply->afterCreateProcess();
+                $reply->afterReplyProcess();
             }
 
             DB::commit();
