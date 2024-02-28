@@ -1,5 +1,6 @@
 @php
-    if (isset($approved) and $approved == true) {
+    use Illuminate\Pagination\LengthAwarePaginator;
+    if (isset($approved) && $approved === true) {
         $comments = $model->approvedComments;
     } else {
         $comments = $model->comments;
@@ -29,7 +30,7 @@
             // Remove parent Comments from comments.
             $comments = $comments->where('child_id', '!=', '');
 
-            $grouped_comments = new \Illuminate\Pagination\LengthAwarePaginator(
+            $grouped_comments = new LengthAwarePaginator(
                 $slicedParentComments->merge($comments)->groupBy('child_id'),
                 $parentComments->count(),
                 $perPage

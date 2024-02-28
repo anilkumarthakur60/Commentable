@@ -17,8 +17,8 @@ return new class() extends Migration {
             $table->boolean('approved')->default(true);
             $table->unsignedBigInteger('child_id')->nullable();
             $table->foreign('child_id')->references('id')->on('comments')->onDelete('cascade');
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
