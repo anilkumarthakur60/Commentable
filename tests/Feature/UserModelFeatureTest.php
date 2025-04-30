@@ -76,19 +76,19 @@ describe('Testing Commentable on UserModel', function () {
         // Add comments to posts
         $this->post->comments()->createMany([
             [
-                'comment' => 'Comment 1',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Comment 1',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
             [
-                'comment' => 'Comment 2',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Comment 2',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
         ]);
         $post2->comments()->create([
-            'comment' => 'Comment 3',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Comment 3',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
 
@@ -101,13 +101,13 @@ describe('Testing Commentable on UserModel', function () {
 
     it('can get comments with replies', function () {
         $parentComment = $this->post->comments()->create([
-            'comment' => 'Parent comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Parent comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
-            'approved' => true,
+            'approved'       => true,
         ]);
 
-        $reply = new Comment;
+        $reply = new Comment();
         $reply->comment = 'Reply';
         $reply->commenter()->associate($this->otherUser);
         $reply->commentable()->associate($this->post);
@@ -151,16 +151,16 @@ describe('Testing Commentable on UserModel', function () {
 
     it('can get comments in date range', function () {
         $oldComment = $this->post->comments()->create([
-            'comment' => 'Old comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Old comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
         $oldComment->created_at = '2024-01-01';
         $oldComment->save();
 
         $newComment = $this->post->comments()->create([
-            'comment' => 'New comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'New comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
         $newComment->created_at = '2024-03-01';
@@ -175,16 +175,16 @@ describe('Testing Commentable on UserModel', function () {
     it('can get comments with specific attributes', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'Approved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Approved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => true,
+                'approved'       => true,
             ],
             [
-                'comment' => 'Unapproved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Unapproved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => false,
+                'approved'       => false,
             ],
         ]);
 
@@ -196,8 +196,8 @@ describe('Testing Commentable on UserModel', function () {
 
     it('can get comments with relations', function () {
         $comment = $this->post->comments()->create([
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Test comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
 
@@ -210,8 +210,8 @@ describe('Testing Commentable on UserModel', function () {
 
     it('comments are deleted when post is deleted', function () {
         $this->post->comments()->create([
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Test comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
 
@@ -223,16 +223,16 @@ describe('Testing Commentable on UserModel', function () {
     it('can get approved comments only', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'Approved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Approved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => true,
+                'approved'       => true,
             ],
             [
-                'comment' => 'Unapproved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Unapproved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => false,
+                'approved'       => false,
             ],
         ]);
 
