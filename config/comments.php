@@ -84,8 +84,8 @@ return [
 
     // middleware
     'middleware' => [
-        // 'web',
-        'api',
+        'web',
+        // 'api',
     ],
 
     'response_status' => [
