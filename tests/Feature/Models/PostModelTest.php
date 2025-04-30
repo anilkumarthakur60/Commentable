@@ -85,7 +85,7 @@ describe('Testing Commentable on PostModel', function () {
             ],
         ]);
 
-        expect($this->post->commentsCount)->toBe(2);
+        expect($this->post->comments()->count())->toBe(2);
     });
 
     test('it can get approved comments count', function () {
@@ -104,11 +104,11 @@ describe('Testing Commentable on PostModel', function () {
             ],
         ]);
 
-        expect($this->post->approvedCommentsCount)->toBe(1);
+        expect($this->post->approvedCommentsCount())->toBe(1);
     });
 
     test('it can check if post has comments', function () {
-        expect($this->post->hasComments())->toBeFalse();
+        expect($this->post->hasComments())->toBe(0);
 
         $this->post->comments()->create([
             'comment' => 'Test comment',
@@ -116,7 +116,7 @@ describe('Testing Commentable on PostModel', function () {
             'commenter_type' => UserModel::class,
         ]);
 
-        expect($this->post->hasComments())->toBeTrue();
+        expect($this->post->hasComments())->toBe(1);
     });
 
     test('it can check if post has approved comments', function () {

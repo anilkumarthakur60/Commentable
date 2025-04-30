@@ -28,4 +28,20 @@ class PostModel extends Model
     protected $fillable = [
         'name',
     ];
+    // hasApprovedComments
+
+    public function hasApprovedComments(): bool
+    {
+        return $this->comments()->where('approved', true)->exists();
+    }
+
+    public function hasComments(): int
+    {
+        return $this->comments()->count();
+    }
+
+    public function approvedCommentsCount(): int
+    {
+        return $this->comments()->where('approved', true)->count();
+    }
 }
