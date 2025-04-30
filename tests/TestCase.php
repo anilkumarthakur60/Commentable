@@ -31,13 +31,13 @@ abstract class TestCase extends OrchestraTestCase
         /** @var Application $app */
         $app = $this->app;
         $app['config']->set('auth.guards.web', [
-            'driver' => 'session',
+            'driver'   => 'session',
             'provider' => 'users',
         ]);
 
         $app['config']->set('auth.providers.users', [
             'driver' => 'eloquent',
-            'model' => UserModel::class,
+            'model'  => UserModel::class,
         ]);
 
         $app['config']->set('auth.defaults.guard', 'web');
@@ -47,20 +47,19 @@ abstract class TestCase extends OrchestraTestCase
     protected function setUpDatabase(): void
     {
         $schema = $this->app['db']->connection()->getSchemaBuilder();
-        if (! $schema->hasTable('users')) {
+        if (!$schema->hasTable('users')) {
             $this->userMigration();
         }
-        if (! $schema->hasTable('tags')) {
+        if (!$schema->hasTable('tags')) {
             $this->tagMigration();
         }
-        if (! $schema->hasTable('posts')) {
+        if (!$schema->hasTable('posts')) {
             $this->postMigration();
         }
     }
 
     protected function userMigration(): void
     {
-
         /** @var Application $app */
         $app = $this->app;
         $app['db']->connection()
@@ -76,7 +75,6 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function tagMigration(): void
     {
-
         /** @var Application $app */
         $app = $this->app;
         $app['db']->connection()
