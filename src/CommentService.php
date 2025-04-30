@@ -102,7 +102,7 @@ class CommentService
             $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
-            if (method_exists($comment, 'afterCreateProcess')) {
+            if (method_exists($model, 'afterCreateProcess')) {
                 $model->afterCreateProcess();
             }
 
@@ -120,7 +120,7 @@ class CommentService
      * Handles updating the message of the comment.
      *
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function update(Request $request, Comment $comment): Comment
     {
@@ -152,7 +152,7 @@ class CommentService
      * Handles deleting a comment.
      *
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function destroy(Comment $comment): void
     {
@@ -186,7 +186,7 @@ class CommentService
      * Handles creating a reply "comment" to a comment.
      *
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function reply(Request $request, Comment $comment): Comment
     {
@@ -196,15 +196,27 @@ class CommentService
             'message' => 'required|string',
         ])->validate();
 
+        /**
+         * @var class-string<Comment> $commentClass
+         */
         $commentClass = Config::get('comments.model');
 
         try {
             DB::beginTransaction();
+
+            /**
+             * @var string $message
+             */
+            $message = $request->message;
+
+            /**
+             * @var Comment $reply
+             */
             $reply = new $commentClass;
             $reply->commenter()->associate(Auth::user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
-            $reply->comment = $request->message;
+            $reply->comment = $message;
             $reply->approved = ! Config::get('comments.approval_required');
             $reply->save();
 
