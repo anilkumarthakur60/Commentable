@@ -16,7 +16,8 @@
     "laravel/pint": "^1.22",
     "larastan/larastan": "^1.0|^2.0|^3.0",
     "orchestra/testbench": "^9.0|^10.0",
-    "phpstan/phpstan": "^2.0|^3.0"
+    "phpstan/phpstan": "^2.0|^3.0",
+    "pestphp/pest": "^2.0||^3.0"
   },
   "autoload": {
     "psr-4": {
@@ -43,6 +44,11 @@
     "sort-packages": true,
     "allow-plugins": {
       "pestphp/pest-plugin": true
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Anil\\Comments\\Tests\\": "tests"
     }
   },
   "scripts": {

@@ -13,3 +13,6 @@ parameters:
     level: 9
 
     excludePaths:
+
+    ignoreErrors:
+        - '#Trait .* is used zero times and is not analysed#'
