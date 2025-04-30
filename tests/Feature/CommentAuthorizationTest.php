@@ -13,7 +13,7 @@ beforeEach(function () {
 
 test('it cannot update other users comment', function () {
     $comment = $this->post->comments()->create([
-        'message' => 'Original comment',
+        'comment' => 'Original comment',
         'user_id' => $this->otherUser->id,
     ]);
 
@@ -25,13 +25,13 @@ test('it cannot update other users comment', function () {
     $response->assertStatus(403);
     $this->assertDatabaseHas('comments', [
         'id' => $comment->id,
-        'message' => 'Original comment',
+        'comment' => 'Original comment',
     ]);
 });
 
 test('it cannot delete other users comment', function () {
     $comment = $this->post->comments()->create([
-        'message' => 'Comment to delete',
+        'comment' => 'Comment to delete',
         'user_id' => $this->otherUser->id,
     ]);
 
@@ -41,7 +41,7 @@ test('it cannot delete other users comment', function () {
     $response->assertStatus(403);
     $this->assertDatabaseHas('comments', [
         'id' => $comment->id,
-        'message' => 'Comment to delete',
+        'comment' => 'Comment to delete',
     ]);
 });
 
@@ -49,24 +49,23 @@ test('it can only view approved comments when configured', function () {
     config(['comments.approval_required' => true]);
 
     $approvedComment = $this->post->comments()->create([
-        'message' => 'Approved comment',
+        'comment' => 'Approved comment',
         'user_id' => $this->user->id,
         'approved' => true,
     ]);
 
     $unapprovedComment = $this->post->comments()->create([
-        'message' => 'Unapproved comment',
+        'comment' => 'Unapproved comment',
         'user_id' => $this->user->id,
         'approved' => false,
     ]);
 
     $response = $this->actingAs($this->user)
-        ->getJson('/comments?model='.PostModel::class.'&id='.$this->post->id.'&approved=true');
+        ->get(route('posts.show', $this->post));
 
     $response->assertStatus(200)
-        ->assertJsonCount(1)
-        ->assertJsonFragment(['message' => 'Approved comment'])
-        ->assertJsonMissing(['message' => 'Unapproved comment']);
+        ->assertSee('Approved comment')
+        ->assertDontSee('Unapproved comment');
 });
 
 test('it can comment as guest when enabled', function () {
@@ -75,7 +74,7 @@ test('it can comment as guest when enabled', function () {
     $response = $this->postJson('/comments', [
         'commentable_type' => PostModel::class,
         'commentable_id' => $this->post->id,
-        'message' => 'Guest comment',
+        'comment' => 'Guest comment',
         'guest_name' => 'Guest User',
         'guest_email' => 'guest@example.com',
     ]);
@@ -84,7 +83,7 @@ test('it can comment as guest when enabled', function () {
     $this->assertDatabaseHas('comments', [
         'commentable_type' => PostModel::class,
         'commentable_id' => $this->post->id,
-        'message' => 'Guest comment',
+        'comment' => 'Guest comment',
         'guest_name' => 'Guest User',
         'guest_email' => 'guest@example.com',
     ]);
@@ -96,13 +95,13 @@ test('it cannot comment as guest when disabled', function () {
     $response = $this->postJson('/comments', [
         'commentable_type' => PostModel::class,
         'commentable_id' => $this->post->id,
-        'message' => 'Guest comment',
+        'comment' => 'Guest comment',
         'guest_name' => 'Guest User',
         'guest_email' => 'guest@example.com',
     ]);
 
     $response->assertStatus(403);
     $this->assertDatabaseMissing('comments', [
-        'message' => 'Guest comment',
+        'comment' => 'Guest comment',
     ]);
 });
