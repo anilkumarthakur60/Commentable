@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $comment
- * @property bool   $approved
+ * @property bool $approved
  * @property string $guest_name
  * @property string $guest_email
  * @property string $commentable_type

@@ -23,12 +23,12 @@ class CommentService
     public function store(Request $request): Comment
     {
         // If guest commenting is turned off, authorize this action.
-        if (!Config::get('comments.guest_commenting')) {
+        if (! Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
         // Define guest rules if a user is not logged in.
-        if (!$request->user()) {
+        if (! $request->user()) {
             $guest_rules = [
                 'guest_name' => [
                     'required',
@@ -73,7 +73,7 @@ class CommentService
             /**
              * @var Comment $comment
              */
-            $comment = new $commentClass();
+            $comment = new $commentClass;
 
             /**
              * @var string $guestName
@@ -84,7 +84,7 @@ class CommentService
              */
             $guestEmail = $request->guest_email;
 
-            if (!$request->user()) {
+            if (! $request->user()) {
                 $comment->guest_name = $guestName;
                 $comment->guest_email = $guestEmail;
             } else {
@@ -98,7 +98,7 @@ class CommentService
 
             $comment->commentable()->associate($model);
             $comment->comment = $message;
-            $comment->approved = !Config::get('comments.approval_required');
+            $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
             if (method_exists($model, 'afterCreateProcess')) {
@@ -214,12 +214,12 @@ class CommentService
             /**
              * @var Comment $reply
              */
-            $reply = new $commentClass();
+            $reply = new $commentClass;
             $reply->commenter()->associate(Auth::user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $message;
-            $reply->approved = !Config::get('comments.approval_required');
+            $reply->approved = ! Config::get('comments.approval_required');
             $reply->save();
 
             if (method_exists($reply, 'afterReplyProcess')) {

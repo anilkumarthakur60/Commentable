@@ -31,13 +31,13 @@ abstract class TestCase extends OrchestraTestCase
         /** @var Application $app */
         $app = $this->app;
         $app['config']->set('auth.guards.web', [
-            'driver'   => 'session',
+            'driver' => 'session',
             'provider' => 'users',
         ]);
 
         $app['config']->set('auth.providers.users', [
             'driver' => 'eloquent',
-            'model'  => UserModel::class,
+            'model' => UserModel::class,
         ]);
 
         $app['config']->set('auth.defaults.guard', 'web');
@@ -47,13 +47,10 @@ abstract class TestCase extends OrchestraTestCase
     protected function setUpDatabase(): void
     {
         $schema = $this->app['db']->connection()->getSchemaBuilder();
-        if (!$schema->hasTable('users')) {
+        if (! $schema->hasTable('users')) {
             $this->userMigration();
         }
-        if (!$schema->hasTable('tags')) {
-            $this->tagMigration();
-        }
-        if (!$schema->hasTable('posts')) {
+        if (! $schema->hasTable('posts')) {
             $this->postMigration();
         }
     }
@@ -69,19 +66,6 @@ abstract class TestCase extends OrchestraTestCase
                 $table->string(column: 'name');
                 $table->string(column: 'email');
                 $table->string(column: 'password');
-                $table->timestamps();
-            });
-    }
-
-    protected function tagMigration(): void
-    {
-        /** @var Application $app */
-        $app = $this->app;
-        $app['db']->connection()
-            ->getSchemaBuilder()
-            ->create('tags', function (Blueprint $table) {
-                $table->id();
-                $table->string(column: 'name');
                 $table->timestamps();
             });
     }

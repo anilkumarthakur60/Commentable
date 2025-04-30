@@ -35,13 +35,12 @@ trait Commenter
     /**
      * Returns only approved comments that this user has made.
      *
-     * @param Builder<Comment> $builder
-     *
+     * @param  Builder<Comment>  $builder
      * @return Builder<Comment>
      */
     public function scopeApprovedComments(Builder $builder, bool $approved = false): Builder
     {
-        if (!is_bool($approved)) {
+        if (! is_bool($approved)) {
             return $builder->comments();
         }
 
