@@ -1,10 +1,12 @@
 <?php
 
+use Anil\Comments\Comment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
@@ -15,8 +17,7 @@ return new class() extends Migration {
             $table->string('guest_email')->nullable();
             $table->longText('comment');
             $table->boolean('approved')->default(true);
-            $table->unsignedBigInteger('child_id')->nullable();
-            $table->foreign('child_id')->references('id')->on('comments')->onDelete('cascade');
+            $table->foreignIdFor(Comment::class, 'child_id')->nullable()->constrained('comments')->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

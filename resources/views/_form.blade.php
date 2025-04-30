@@ -1,14 +1,14 @@
 <div class="card">
     <div class="card-body">
         @if($errors->has('commentable_type'))
-            <div class="alert alert-danger" role="alert">
-                {{ $errors->first('commentable_type') }}
-            </div>
+        <div class="alert alert-danger" role="alert">
+            {{ $errors->first('commentable_type') }}
+        </div>
         @endif
         @if($errors->has('commentable_id'))
-            <div class="alert alert-danger" role="alert">
-                {{ $errors->first('commentable_id') }}
-            </div>
+        <div class="alert alert-danger" role="alert">
+            {{ $errors->first('commentable_id') }}
+        </div>
         @endif
         <form method="POST" action="{{ route('comments.store') }}">
             @csrf
@@ -18,24 +18,24 @@
 
             {{-- Guest commenting --}}
             @if(isset($guest_commenting) and $guest_commenting == true)
-                <div class="form-group">
-                    <label for="message">@lang('comments::comments.enter_your_name_here')</label>
-                    <input type="text" class="form-control @if($errors->has('guest_name')) is-invalid @endif" name="guest_name" />
-                    @error('guest_name')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
+            <div class="form-group">
+                <label for="message">@lang('comments::comments.enter_your_name_here')</label>
+                <input type="text" class="form-control @if($errors->has('guest_name')) is-invalid @endif" name="guest_name" />
+                @error('guest_name')
+                <div class="invalid-feedback">
+                    {{ $message }}
                 </div>
-                <div class="form-group">
-                    <label for="message">@lang('comments::comments.enter_your_email_here')</label>
-                    <input type="email" class="form-control @if($errors->has('guest_email')) is-invalid @endif" name="guest_email" />
-                    @error('guest_email')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
+                @enderror
+            </div>
+            <div class="form-group">
+                <label for="message">@lang('comments::comments.enter_your_email_here')</label>
+                <input type="email" class="form-control @if($errors->has('guest_email')) is-invalid @endif" name="guest_email" />
+                @error('guest_email')
+                <div class="invalid-feedback">
+                    {{ $message }}
                 </div>
+                @enderror
+            </div>
             @endif
 
             <div class="form-group">
