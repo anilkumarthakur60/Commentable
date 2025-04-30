@@ -15,8 +15,8 @@ describe('Testing Commentable on PostModel', function () {
 
     test('it can create a comment on post', function () {
         $comment = $this->post->comments()->create([
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Test comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
         $comment->commenter()->associate($this->user);
@@ -31,13 +31,13 @@ describe('Testing Commentable on PostModel', function () {
     test('it can get all comments for a post', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'First comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'First comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
             [
-                'comment' => 'Second comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Second comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
         ]);
@@ -52,16 +52,16 @@ describe('Testing Commentable on PostModel', function () {
     test('it can get approved comments only', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'Approved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Approved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => true,
+                'approved'       => true,
             ],
             [
-                'comment' => 'Unapproved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Unapproved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => false,
+                'approved'       => false,
             ],
         ]);
 
@@ -74,13 +74,13 @@ describe('Testing Commentable on PostModel', function () {
     test('it can get comments count', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'First comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'First comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
             [
-                'comment' => 'Second comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Second comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
             ],
         ]);
@@ -91,16 +91,16 @@ describe('Testing Commentable on PostModel', function () {
     test('it can get approved comments count', function () {
         $this->post->comments()->createMany([
             [
-                'comment' => 'Approved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Approved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => true,
+                'approved'       => true,
             ],
             [
-                'comment' => 'Unapproved comment',
-                'commenter_id' => $this->user->id,
+                'comment'        => 'Unapproved comment',
+                'commenter_id'   => $this->user->id,
                 'commenter_type' => UserModel::class,
-                'approved' => false,
+                'approved'       => false,
             ],
         ]);
 
@@ -111,8 +111,8 @@ describe('Testing Commentable on PostModel', function () {
         expect($this->post->hasComments())->toBe(0);
 
         $this->post->comments()->create([
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Test comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
         ]);
 
@@ -123,10 +123,10 @@ describe('Testing Commentable on PostModel', function () {
         expect($this->post->hasApprovedComments())->toBeFalse();
 
         $this->post->comments()->create([
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
+            'comment'        => 'Test comment',
+            'commenter_id'   => $this->user->id,
             'commenter_type' => UserModel::class,
-            'approved' => true,
+            'approved'       => true,
         ]);
 
         expect($this->post->hasApprovedComments())->toBeTrue();
