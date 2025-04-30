@@ -3,23 +3,24 @@
 namespace Anil\Comments;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class CommentService
 {
     /**
-     * Handles creating a new comment for given model.
+     * Handles creating a new comment for a given model.
      *
-     * @return mixed the configured comment-model
      *
-     * @throws Exception
+     * @throws Throwable
      */
-    public function store(Request $request)
+    public function store(Request $request): Comment
     {
         // If guest commenting is turned off, authorize this action.
         if (! Config::get('comments.guest_commenting')) {
@@ -29,35 +30,75 @@ class CommentService
         // Define guest rules if user is not logged in.
         if (! Auth::check()) {
             $guest_rules = [
-                'guest_name' => 'required|string|max:255',
-                'guest_email' => 'required|string|email|max:255',
+                'guest_name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+                'guest_email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                ],
             ];
         }
 
         // Merge guest rules, if any, with normal validation rules.
         Validator::make($request->all(), array_merge($guest_rules ?? [], [
-            'commentable_type' => 'required|string',
-            'commentable_id' => 'required|string|min:1',
+            'commentable_type' => [
+                'required',
+                'string',
+            ],
+            'commentable_id' => [
+                'required',
+                'string',
+                'min:1',
+            ],
             'message' => 'required|string',
         ]))->validate();
 
-        $model = $request->commentable_type::findOrFail($request->commentable_id);
+        /**
+         * @var class-string<Model> $commentableModel
+         */
+        $commentableModel = $request->commentableModel;
+        /**
+         * @var Model $model
+         */
+        $model = $commentableModel::query()->findOrFail($request->commentable_id);
 
         $commentClass = Config::get('comments.model');
 
         try {
             DB::beginTransaction();
+            /**
+             * @var Comment $comment
+             */
             $comment = new $commentClass;
 
+            /**
+             * @var string $guestName
+             */
+            $guestName = $request->guest_name;
+            /**
+             * @var string $guestEmail
+             */
+            $guestEmail = $request->guest_email;
+
             if (! Auth::check()) {
-                $comment->guest_name = $request->guest_name;
-                $comment->guest_email = $request->guest_email;
+                $comment->guest_name = $guestName;
+                $comment->guest_email = $guestEmail;
             } else {
                 $comment->commenter()->associate(Auth::user());
             }
 
+            /**
+             * @var string $message
+             */
+            $message = $request->message;
+
             $comment->commentable()->associate($model);
-            $comment->comment = $request->message;
+            $comment->comment = $message;
             $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
@@ -78,11 +119,10 @@ class CommentService
     /**
      * Handles updating the message of the comment.
      *
-     * @return Comment the configured comment-model
      *
      * @throws Exception
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, Comment $comment): Comment
     {
         Gate::authorize('edit-comment', $comment);
 
@@ -111,7 +151,6 @@ class CommentService
     /**
      * Handles deleting a comment.
      *
-     * @return mixed the configured comment-model
      *
      * @throws Exception
      */
@@ -146,11 +185,10 @@ class CommentService
     /**
      * Handles creating a reply "comment" to a comment.
      *
-     * @return mixed the configured comment-model
      *
      * @throws Exception
      */
-    public function reply(Request $request, Comment $comment)
+    public function reply(Request $request, Comment $comment): Comment
     {
         Gate::authorize('reply-to-comment', $comment);
 

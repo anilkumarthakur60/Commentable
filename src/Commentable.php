@@ -16,7 +16,7 @@ trait Commentable
      * delete leftover comments once the commentable
      * model is deleted.
      */
-    protected static function bootCommentable()
+    protected static function bootCommentable(): void
     {
         static::deleted(function ($commentable) {
             foreach ($commentable->comments as $comment) {
@@ -27,17 +27,23 @@ trait Commentable
 
     /**
      * Returns all comments for this model.
+     *
+     * @return MorphMany<Comment, Commentable>
      */
     public function comments(): MorphMany
     {
+        /** @var MorphMany<Comment, Commentable> */
         return $this->morphMany(Config::get('comments.model'), 'commentable');
     }
 
     /**
      * Returns only approved comments for this model.
+     *
+     * @return MorphMany<Comment, Commentable>
      */
     public function approvedComments(bool $approved = true): MorphMany
     {
+        /** @var MorphMany<Comment, Commentable> */
         return $this->comments()->where('approved', $approved);
     }
 }

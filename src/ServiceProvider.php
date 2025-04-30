@@ -17,7 +17,7 @@ class ServiceProvider extends LaravelServiceProvider
      * then load the routes, otherwise don't load
      * the routes.
      */
-    protected function loadRoutes()
+    protected function loadRoutes(): void
     {
         if (Config::get('comments.routes') === true) {
             $this->loadRoutesFrom(__DIR__.'/routes.php');
@@ -29,7 +29,7 @@ class ServiceProvider extends LaravelServiceProvider
      * then load the package migrations, otherwise don't load
      * the migrations.
      */
-    protected function loadMigrations()
+    protected function loadMigrations(): void
     {
         if (Config::get('comments.load_migrations') === true) {
             $this->loadMigrationsFrom(__DIR__.'/../migrations');
@@ -39,7 +39,7 @@ class ServiceProvider extends LaravelServiceProvider
     /**
      * If for some reason you want to override the component.
      */
-    protected function includeBladeComponent()
+    protected function includeBladeComponent(): void
     {
         Blade::include('comments::components.comments', 'comments');
     }
@@ -47,14 +47,18 @@ class ServiceProvider extends LaravelServiceProvider
     /**
      * Define permission defined in the config.
      */
-    protected function definePermissions()
+    protected function definePermissions(): void
     {
-        foreach (Config::get('comments.permissions', []) as $permission => $policy) {
+        /**
+         * @var array<string, string> $permissions
+         */
+        $permissions = Config::get('comments.permissions', []);
+        foreach ($permissions as $permission => $policy) {
             Gate::define($permission, $policy);
         }
     }
 
-    public function boot()
+    public function boot(): void
     {
         $this->loadRoutes();
 
@@ -84,14 +88,18 @@ class ServiceProvider extends LaravelServiceProvider
             __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
         ], 'translations');
 
-        Route::model('comment', Config::get('comments.model'));
+        /**
+         * @var string $model
+         */
+        $model = Config::get('comments.model');
+        Route::model($model, $model);
 
         if (Config::get('comments.paginator_use_bootstrap', true)) {
             Paginator::useBootstrap();
         }
     }
 
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/comments.php',

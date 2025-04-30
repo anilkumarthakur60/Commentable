@@ -14,6 +14,8 @@ trait Commenter
 {
     /**
      * Returns all comments that this user has made.
+     *
+     * @return MorphMany<Comment, Commenter>
      */
     public function comments(): MorphMany
     {
@@ -22,16 +24,21 @@ trait Commenter
 
     /**
      * Returns only approved comments that this user has made.
+     *
+     * @return MorphMany<Comment, Commenter>
      */
-    public function approvedComments(bool $approved = true)
+    public function approvedComments(bool $approved = true): MorphMany
     {
         return $this->comments()->where('approved', $approved);
     }
 
     /**
      * Returns only approved comments that this user has made.
+     *
+     * @param  Builder<Comment>  $builder
+     * @return Builder<Comment>
      */
-    public function scopeApprovedComments(Builder $builder, bool $approved = false)
+    public function scopeApprovedComments(Builder $builder, bool $approved = false): Builder
     {
         if (! is_bool($approved)) {
             return $builder->comments();

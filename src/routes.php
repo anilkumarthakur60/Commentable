@@ -3,7 +3,16 @@
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 
-Route::post('comments', Config::get('comments.controller').'@store')->name('comments.store');
-Route::delete('comments/{comment}', Config::get('comments.controller').'@destroy')->name('comments.destroy');
-Route::put('comments/{comment}', Config::get('comments.controller').'@update')->name('comments.update');
-Route::post('comments/{comment}', Config::get('comments.controller').'@reply')->name('comments.reply');
+/**
+ * @var string $controller
+ */
+$controller = Config::get('comments.controller');
+Route::controller($controller)
+    ->prefix('comments')
+    ->as('comments.')
+    ->group(function () {
+        Route::post('', 'store')->name('store');
+        Route::delete('{comment}', 'destroy')->name('destroy');
+        Route::put('{comment}', 'update')->name('update');
+        Route::post('{comment}', 'reply')->name('reply');
+    });

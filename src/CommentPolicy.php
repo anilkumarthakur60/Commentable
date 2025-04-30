@@ -2,36 +2,38 @@
 
 namespace Anil\Comments;
 
+use Illuminate\Foundation\Auth\User;
+
 class CommentPolicy
 {
     /**
-     * Can user create the comment.
+     * Can a user create the comment?
      */
-    public function create($user): bool
+    public function create(User $user): bool
     {
         return true;
     }
 
     /**
-     * Can user delete the comment.
+     * Can a user delete the comment?
      */
-    public function delete($user, Comment $comment): bool
+    public function delete(User $user, Comment $comment): bool
     {
         return $user->getKey() === $comment->commenter_id;
     }
 
     /**
-     * Can user update the comment.
+     * Can a user update the comment?
      */
-    public function update($user, Comment $comment): bool
+    public function update(User $user, Comment $comment): bool
     {
         return $user->getKey() === $comment->commenter_id;
     }
 
     /**
-     * Can user reply to the comment.
+     * Can a user reply to the comment?
      */
-    public function reply($user, Comment $comment): bool
+    public function reply(User $user, Comment $comment): bool
     {
         return $user->getKey() !== $comment->commenter_id;
     }
