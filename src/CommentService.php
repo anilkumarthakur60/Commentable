@@ -27,8 +27,8 @@ class CommentService
             Gate::authorize('create-comment', Comment::class);
         }
 
-        // Define guest rules if user is not logged in.
-        if (! Auth::check()) {
+        // Define guest rules if a user is not logged in.
+        if (! $request->user()) {
             $guest_rules = [
                 'guest_name' => [
                     'required',
@@ -52,7 +52,6 @@ class CommentService
             ],
             'commentable_id' => [
                 'required',
-                'string',
                 'min:1',
             ],
             'message' => 'required|string',
@@ -61,7 +60,7 @@ class CommentService
         /**
          * @var class-string<Model> $commentableModel
          */
-        $commentableModel = $request->commentableModel;
+        $commentableModel = $request->commentable_type;
         /**
          * @var Model $model
          */
@@ -85,11 +84,11 @@ class CommentService
              */
             $guestEmail = $request->guest_email;
 
-            if (! Auth::check()) {
+            if (! $request->user()) {
                 $comment->guest_name = $guestName;
                 $comment->guest_email = $guestEmail;
             } else {
-                $comment->commenter()->associate(Auth::user());
+                $comment->commenter()->associate($request->user());
             }
 
             /**
@@ -193,7 +192,10 @@ class CommentService
         Gate::authorize('reply-to-comment', $comment);
 
         Validator::make($request->all(), [
-            'message' => 'required|string',
+            'message' => [
+                'required',
+                'string',
+            ],
         ])->validate();
 
         /**

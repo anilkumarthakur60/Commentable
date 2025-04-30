@@ -10,13 +10,13 @@ abstract class CommentController extends Controller implements CommentController
 {
     public function __construct()
     {
-        $this->middleware('web');
+        $this->middleware(Config::get('comments.middleware'));
 
         if (Config::get('comments.guest_commenting')) {
-            $this->middleware('auth')->except('store');
+            $this->middleware(Config::get('comments.middleware'))->except('store');
             $this->middleware(ProtectAgainstSpam::class)->only('store');
         } else {
-            $this->middleware('auth');
+            $this->middleware(Config::get('comments.middleware'));
         }
     }
 }

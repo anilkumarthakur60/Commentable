@@ -82,4 +82,22 @@ return [
      */
     'paginator_use_bootstrap' => true,
 
+    // middleware
+    'middleware' => [
+        // 'web',
+        'api',
+    ],
+
+    'response_status' => [
+        'created' => 201,
+        'updated' => 200,
+        'deleted' => 200,
+    ],
+
+    'response_messages' => [
+        'created' => 'Comment created successfully',
+        'updated' => 'Comment updated successfully',
+        'deleted' => 'Comment deleted successfully',
+    ],
+
 ];

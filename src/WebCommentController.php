@@ -2,8 +2,10 @@
 
 namespace Anil\Comments;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use Throwable;
@@ -21,9 +23,13 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->store($request);
+        if ($request->wantsJson()) {
+            return CommentResource::make($comment);
+        }
+
         /**
          * @var string $key
          */
@@ -38,9 +44,13 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function update(Request $request, Comment $comment): RedirectResponse
+    public function update(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->update($request, $comment);
+        if ($request->wantsJson()) {
+            return CommentResource::make($comment);
+        }
+
         /**
          * @var string $key
          */
@@ -55,9 +65,14 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function destroy(Comment $comment): RedirectResponse
+    public function destroy(Request $request, Comment $comment): RedirectResponse|JsonResponse
     {
         $this->commentService->destroy($comment);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => Config::get('comments.response_messages.deleted'),
+            ], Config::get('comments.response_status.deleted'));
+        }
 
         return Redirect::back();
     }
@@ -67,9 +82,12 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function reply(Request $request, Comment $comment): RedirectResponse
+    public function reply(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $reply = $this->commentService->reply($request, $comment);
+        if ($request->wantsJson()) {
+            return CommentResource::make($reply);
+        }
 
         /**
          * @var string $key
