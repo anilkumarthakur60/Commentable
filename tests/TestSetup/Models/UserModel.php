@@ -14,11 +14,8 @@ use Illuminate\Support\Facades\Request;
  * @property-read int $id
  * @property-read string $name
  * @property-read string $email
- * @property-read int $status
- * @property-read int $active
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
- * @property-read Carbon $deleted_at
  *
  * @method static Builder<Model> initializer(bool $orderBy = true)
  * @method static Builder<Model> paginates(int $perPage = 15)

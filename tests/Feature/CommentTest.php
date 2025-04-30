@@ -10,7 +10,7 @@ beforeEach(function () {
 
 test('it can create a comment', function () {
     $response = $this->actingAs($this->user)
-        ->postJson('/comments', [
+        ->postJson('comments', [
             'commentable_type' => PostModel::class,
             'commentable_id' => $this->post->id,
             'message' => 'Test comment',

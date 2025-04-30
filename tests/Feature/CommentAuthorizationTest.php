@@ -18,7 +18,7 @@ test('it cannot update other users comment', function () {
     ]);
 
     $response = $this->actingAs($this->user)
-        ->putJson("/comments/{$comment->id}", [
+        ->putJson("comments/{$comment->id}", [
             'message' => 'Updated comment',
         ]);
 

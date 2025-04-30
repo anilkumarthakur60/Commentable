@@ -2,11 +2,11 @@
 
 namespace Anil\Comments;
 
-use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use Throwable;
 
 class WebCommentController extends CommentController
 {
@@ -19,7 +19,7 @@ class WebCommentController extends CommentController
     /**
      * Creates a new comment for a given model.
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function store(Request $request): RedirectResponse
     {
@@ -36,7 +36,7 @@ class WebCommentController extends CommentController
     /**
      * Updates the message of the comment.
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function update(Request $request, Comment $comment): RedirectResponse
     {
@@ -53,7 +53,7 @@ class WebCommentController extends CommentController
     /**
      * Deletes a comment.
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function destroy(Comment $comment): RedirectResponse
     {
@@ -65,7 +65,7 @@ class WebCommentController extends CommentController
     /**
      * Creates a reply "comment" to a comment.
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function reply(Request $request, Comment $comment): RedirectResponse
     {

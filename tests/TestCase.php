@@ -41,7 +41,6 @@ abstract class TestCase extends OrchestraTestCase
         ]);
 
         $app['config']->set('auth.defaults.guard', 'web');
-        $app['config']->set('permission.guard_name', 'web');
         $this->setUpDatabase();
     }
 
