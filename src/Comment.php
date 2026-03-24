@@ -165,6 +165,20 @@ class Comment extends Model
     }
 
     /**
+     * All reactions on this comment.
+     * Uses the reaction model from config so it can be swapped for a custom one.
+     *
+     * @return HasMany<CommentReaction, $this>
+     */
+    public function reactions(): HasMany
+    {
+        /** @var class-string<CommentReaction> $reactionModel */
+        $reactionModel = config('comments.reaction_model', CommentReaction::class);
+
+        return $this->hasMany($reactionModel);
+    }
+
+    /**
      * Whether this comment was posted by a guest (unauthenticated user).
      */
     public function isGuestComment(): bool

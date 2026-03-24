@@ -13,5 +13,11 @@ Route::controller($controller)
         Route::post('', 'store')->name('store');
         Route::put('{comment}', 'update')->name('update');
         Route::delete('{comment}', 'destroy')->name('destroy');
+
+        // Only register the react route when reactions are enabled.
+        if (Config::get('comments.reactions.enabled', true)) {
+            Route::post('{comment}/react', 'react')->name('react');
+        }
+
         Route::post('{comment}', 'reply')->name('reply');
     });

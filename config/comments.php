@@ -2,22 +2,34 @@
 
 use Anil\Comments\Comment;
 use Anil\Comments\CommentPolicy;
-use Anil\Comments\Enums\UiTheme;
+use Anil\Comments\CommentReaction;
 use Anil\Comments\WebCommentController;
 
 return [
 
-    /**
-     * To extend the base Comment model one just needs to create a new
-     * CustomComment model extending the Comment model shipped with the
-     * package and change this configuration option to their extended model.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Comment Model
+    |--------------------------------------------------------------------------
+    | Extend Comment and point here to customise the comment model.
+    */
     'model' => Comment::class,
 
-    /**
-     * You can customize the behaviour of these permissions by
-     * creating your own policy and pointing to it here.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Reaction Model
+    |--------------------------------------------------------------------------
+    | Extend CommentReaction and point here to customise the reaction model.
+    */
+    'reaction_model' => CommentReaction::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Permissions / Policy
+    |--------------------------------------------------------------------------
+    | Map gate abilities to policy methods. Swap in your own policy class to
+    | override any authorisation logic without touching the package source.
+    */
     'permissions' => [
         'create-comment'   => [CommentPolicy::class, 'create'],
         'delete-comment'   => [CommentPolicy::class, 'delete'],
@@ -25,86 +37,135 @@ return [
         'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
 
-    /**
-     * The Comment Controller.
-     * Change this to your own implementation of the CommentController.
-     * You can use the \Anil\Comments\CommentControllerInterface
-     * or extend the \Anil\Comments\CommentController.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Controller
+    |--------------------------------------------------------------------------
+    | Replace with your own controller that extends CommentController or
+    | implements CommentControllerInterface for full customisation.
+    */
     'controller' => WebCommentController::class,
 
-    /**
-     * Disable/enable the package routes.
-     * If you want to completely take over the way this package handles
-     * routes and controller logic, set this to false and provide your
-     * own routes and controller for comments.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Routes
+    |--------------------------------------------------------------------------
+    | Set to false to disable the package routes entirely and define your own.
+    */
     'routes' => true,
 
-    /**
-     * By default, comments posted are marked as approved. If you want
-     * to change this, set this option to true. Then, all comments
-     * will need to be approved by setting the `approved` column to
-     * `true` for each comment.
-     *
-     * To see only approved comments use this code in your view:
-     *
-     * @comments(['model' => $book, 'approved' => true])
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Comment Approval
+    |--------------------------------------------------------------------------
+    | When true, every new comment requires manual approval before it appears.
+    | Use @comments(['model' => $post, 'approved' => true]) to show only
+    | approved comments in the view.
+    */
     'approval_required' => false,
 
-    /**
-     * Set this option to `true` to enable guest commenting.
-     *
-     * Visitors will be asked to provide their name and email
-     * address in order to post a comment.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Guest Commenting
+    |--------------------------------------------------------------------------
+    | Allow unauthenticated visitors to post comments using a name + email.
+    */
     'guest_commenting' => false,
 
-    /**
-     * Set this option to `true` to enable soft deleting of comments.
-     *
-     * Comments will be soft deleted using Laravel "softDeletes" trait.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Soft Deletes
+    |--------------------------------------------------------------------------
+    | When true, comments are soft-deleted (recoverable).
+    | When false, they are permanently removed.
+    */
     'soft_deletes' => false,
 
-    /**
-     * Enable/disable the package provider to load migrations.
-     * This option might be useful if you use multiple database connections.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Migrations
+    |--------------------------------------------------------------------------
+    | Set to false if you need full control over which database connection
+    | runs the package migrations.
+    */
     'load_migrations' => true,
 
-    /**
-     * UI theme for comment views.
-     *
-     * Available options:
-     *   - 'bootstrap5'  Bootstrap 5 (default) — requires Bootstrap 5 JS/CSS
-     *   - 'bootstrap4'  Bootstrap 4 — requires Bootstrap 4 JS/CSS
-     *   - 'tailwind'    Tailwind CSS — requires Tailwind CSS; modals use native <dialog>
-     *
-     * For Bootstrap themes, the package automatically calls Paginator::useBootstrap().
-     */
-    'ui_theme' => UiTheme::Bootstrap5->value,
+    /*
+    |--------------------------------------------------------------------------
+    | Reactions (Likes / Dislikes)
+    |--------------------------------------------------------------------------
+    | enabled — toggle the entire reactions feature on/off.
+    |           When false, reaction buttons are hidden and the react route
+    |           is not registered.
+    |
+    | types    — list of allowed reaction types.
+    |           Default: ['like', 'dislike'].
+    |           Note: the comment_reactions table stores type as a string,
+    |           so you can add any custom types here. Each type renders its
+    |           own button in the view. Add an entry to the icon map in
+    |           resources/views/comments/_comment.blade.php for a custom icon.
+    */
+    'reactions' => [
+        'enabled' => true,
+        'types'   => ['like', 'dislike'],
+    ],
 
-    /**
-     * Rate limiting for comment submission.
-     *
-     * Set `enabled` to true to throttle comment creation, replies, and updates.
-     * `max_attempts` — max requests per `decay_minutes` window per IP.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Rules
+    |--------------------------------------------------------------------------
+    | Override any of these arrays with your own Laravel validation rules to
+    | customise comment field constraints without touching the package source.
+    */
+    'validation' => [
+        'message'     => ['required', 'string'],
+        'guest_name'  => ['required', 'string', 'max:255'],
+        'guest_email' => ['required', 'string', 'email', 'max:255'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Max Comment Depth
+    |--------------------------------------------------------------------------
+    | Maximum nesting level for threaded replies (0 = no replies allowed).
+    | Can also be overridden per-view: @comments(['model' => $post, 'maxIndentationLevel' => 5])
+    */
+    'max_depth' => 3,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Sort Order
+    |--------------------------------------------------------------------------
+    | 'latest'  — newest comments first  (default)
+    | 'oldest'  — oldest comments first
+    */
+    'sort' => 'latest',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting
+    |--------------------------------------------------------------------------
+    | Throttle comment submission, replies, edits, and reactions per IP.
+    */
     'rate_limiting' => [
         'enabled'       => true,
         'max_attempts'  => 10,
         'decay_minutes' => 1,
     ],
 
-    /**
-     * Middleware applied to all comment routes.
-     */
-    'middleware' => [
-        'web',
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware
+    |--------------------------------------------------------------------------
+    | Applied to all comment routes.
+    */
+    'middleware' => ['web'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | HTTP Response Codes & Messages
+    |--------------------------------------------------------------------------
+    */
     'response_status' => [
         'created' => 201,
         'updated' => 200,

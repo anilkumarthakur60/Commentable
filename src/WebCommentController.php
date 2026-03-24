@@ -5,12 +5,13 @@ namespace Anil\Comments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use Throwable;
 
-class WebCommentController extends CommentController
+class WebCommentController extends CommentController implements CommentControllerInterface
 {
     public function __construct(
         public readonly CommentService $commentService
@@ -74,6 +75,34 @@ class WebCommentController extends CommentController
 
         return Redirect::back()
             ->with('success', Config::get('comments.response_messages.deleted'));
+    }
+
+    /**
+     * Toggles a reaction on a comment. Delegates all business logic to the service.
+     * Returns 404 when reactions are disabled in config.
+     * Returns 401 when the user is not authenticated.
+     */
+    public function react(Request $request, Comment $comment): JsonResponse|RedirectResponse
+    {
+        if (! Config::get('comments.reactions.enabled', true)) {
+            abort(404);
+        }
+
+        if (! Auth::check()) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+
+            return Redirect::route('login');
+        }
+
+        $result = $this->commentService->react($request, $comment);
+
+        if ($request->wantsJson()) {
+            return response()->json($result);
+        }
+
+        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey());
     }
 
     /**

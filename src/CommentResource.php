@@ -32,7 +32,12 @@ class CommentResource extends JsonResource
             'updated_at'       => $this->updated_at,
             'deleted_at'       => $this->deleted_at,
             'commenter'        => $this->commenter,
-            'commentable'      => $this->commentable,
+            'commentable'      => $this->whenLoaded('commentable'),
+            'reactions'        => $this->whenLoaded('reactions', function () {
+                return $this->reactions
+                    ->groupBy('type')
+                    ->map(fn ($group) => $group->count());
+            }),
         ];
     }
 }

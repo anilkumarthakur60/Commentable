@@ -2,8 +2,6 @@
 
 namespace Anil\Comments;
 
-use Anil\Comments\Enums\UiTheme;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
@@ -34,14 +32,6 @@ class ServiceProvider extends LaravelServiceProvider
     }
 
     /**
-     * Register the @comments() Blade include directive for the active theme.
-     */
-    protected function includeBladeComponent(UiTheme $theme): void
-    {
-        Blade::include("comments::{$theme->value}.comments", 'comments');
-    }
-
-    /**
      * Register the Gate permissions defined in the config.
      */
     protected function definePermissions(): void
@@ -54,37 +44,18 @@ class ServiceProvider extends LaravelServiceProvider
         }
     }
 
-    /**
-     * Resolve the configured UI theme, falling back to Bootstrap 5.
-     */
-    protected function resolveTheme(): UiTheme
-    {
-        /** @var string $value */
-        $value = Config::get('comments.ui_theme', UiTheme::Bootstrap5->value);
-
-        return UiTheme::tryFrom($value) ?? UiTheme::Bootstrap5;
-    }
-
     public function boot(): void
     {
-        $theme = $this->resolveTheme();
-
         $this->loadRoutes();
         $this->loadMigrations();
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'comments');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'comments');
 
-        $this->includeBladeComponent($theme);
+        // Single framework-agnostic theme (pure CSS, no Bootstrap/Tailwind required).
+        Blade::include('comments::comments.comments', 'comments');
+
         $this->definePermissions();
-
-        // Share theme name with all views so they can reference sibling partials.
-        view()->share('commentsTheme', $theme->value);
-
-        // Bootstrap themes need the Bootstrap paginator styles.
-        if ($theme->isBootstrap()) {
-            Paginator::useBootstrap();
-        }
 
         /** @var class-string<Comment> $model */
         $model = Config::get('comments.model');
@@ -106,7 +77,6 @@ class ServiceProvider extends LaravelServiceProvider
             __DIR__ . '/../resources/lang' => App::resourcePath('lang/vendor/comments'),
         ], 'comments-translations');
 
-        // Publish everything at once.
         $this->publishes([
             __DIR__ . '/../migrations/'         => App::databasePath('migrations'),
             __DIR__ . '/../resources/views'     => App::resourcePath('views/vendor/comments'),

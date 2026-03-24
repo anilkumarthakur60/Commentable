@@ -26,7 +26,15 @@ abstract class CommentController extends Controller implements CommentController
             $maxAttempts = Config::get('comments.rate_limiting.max_attempts', 10);
             /** @var int $decayMinutes */
             $decayMinutes = Config::get('comments.rate_limiting.decay_minutes', 1);
-            $this->middleware("throttle:{$maxAttempts},{$decayMinutes}")->only(['store', 'reply', 'update']);
+
+            $throttledActions = ['store', 'reply', 'update'];
+
+            // Only throttle react when reactions are enabled.
+            if (Config::get('comments.reactions.enabled', true)) {
+                $throttledActions[] = 'react';
+            }
+
+            $this->middleware("throttle:{$maxAttempts},{$decayMinutes}")->only($throttledActions);
         }
     }
 }
