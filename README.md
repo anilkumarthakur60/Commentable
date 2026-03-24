@@ -1,93 +1,59 @@
-# Comments
+# anil/comments
 
-Comments is a Laravel package. With it you can easily implement native comments for your application.
+A full-featured commenting system for Laravel. Attach comments to any Eloquent model with threaded replies, reactions, guest commenting, approval workflows, and a framework-agnostic UI — all in one package.
 
+## Features
 
-## Overview
-
-This package can be used to comment on any model you have in your application.
-
-All comments are stored in a single table with a polymorphic relation for content and a polymorphic relation for the user who posted the comment.
-
-
-### Features
-
-- View comments
-- Create comments
-- Delete comments
-- Edit comments
-- Reply to comments
-- Authorization rules
-- Support localization
-- Dispatch events
-- Route, Controller, Comment, Migration & View customizations
-- Support for non-integer IDs
-- Support for multiple User models
-- Solved N+1 query problem
-- Comment approval (opt-in)
-- Guest commenting (opt-in)
-- Pagination (opt-in)
+- Comment on any Eloquent model (polymorphic)
+- Threaded replies with configurable nesting depth
+- Reactions system (like/dislike, or any custom types)
+- Guest commenting with honeypot spam protection
+- Comment approval workflow
 - Soft deletes (opt-in)
-- Works with custom ID columns
-- Optionally load package migrations [NEW]
-- Configure maximum indentation level [NEW]
+- Pagination (top-level comments)
+- Rate limiting
+- Authorization via Laravel gates/policies
+- Events dispatched on create, update, and delete
+- Framework-agnostic UI (no Bootstrap or Tailwind required)
+- Gravatar avatars with color-coded initials fallback
+- 13 supported locales
+- Full REST API
+- Support for multiple User models and non-integer IDs
+- N+1 query optimized
 
 
-### Screenshots
+## Screenshots
 
-Here are a few screenshots.
+**Guest user** (guest commenting enabled — name and email fields shown):
 
-No comments & guest:
+![Guest view](guest.png)
 
-![](https://i.imgur.com/9df4Xun.png)
+**Logged-in user** (comment form without guest fields, reply button visible):
 
-No comments & logged in:
+![Logged-in view](logged-in.png)
 
-![](https://i.imgur.com/ALI6GbR.png)
+**Logged-out user** (guest commenting disabled — authentication prompt shown):
 
-One comment:
-
-![](https://i.imgur.com/9wBNiy2.png)
-
-One comment edit form:
-
-![](https://i.imgur.com/cxDh34O.png)
-
-Two comments from different users:
-
-![](https://i.imgur.com/2P5u25x.png)
+![Logged-out view](logout.png)
 
 
-### Tutorials & articles
+## Requirements
 
-I plan to expand this chapter with more tutorials and articles. If you write something about this package let me know, so that I can update this chapter.
-
-**Screencasts:**
-
-- [Adding comments to your Laravel application](https://www.youtube.com/watch?v=YhA0CSX1HIg) by Andre Madarang.
+- PHP 8.2+
+- Laravel 11, 12, or 13
 
 
 ## Installation
 
-From the command line:
-
 ```bash
 composer require anil/comments
-```
-
-
-### Run migrations
-
-We need to create the table for comments.
-
-```bash
 php artisan migrate
 ```
 
 
-### Add Commenter trait to your User model
+## Setup
 
-Add the `Commenter` trait to your User model so that you can retrieve the comments for a user:
+### 1. Add `Commenter` trait to your User model
 
 ```php
 use Anil\Comments\Commenter;
@@ -98,102 +64,47 @@ class User extends Authenticatable
 }
 ```
 
-
-### Add Commentable trait to models
-
-Add the `Commentable` trait to the model for which you want to enable comments for:
+### 2. Add `Commentable` trait to any model you want to comment on
 
 ```php
 use Anil\Comments\Commentable;
 
-class Product extends Model
+class Post extends Model
 {
     use Commentable;
 }
 ```
 
+### 3. Render the comments component in your view
 
-### Publish Config & configure (optional)
-
-Publish the config file (optional):
-
-```bash
-php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=config
+```blade
+@comments(['model' => $post])
 ```
 
-
-### Publish views (customization)
-
-The default UI is made for Bootstrap 4, but you can change it however you want.
-
-```bash
-php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=views
-```
+That's it. The package auto-detects the authenticated user and renders the full comment UI.
 
 
-### Publish Migrations (customization)
+## Blade Component Options
 
-You can publish migration to allow you to have more control over your table
-
-```bash
-php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=migrations
-```
-
-
-### Publish translations (customization)
-
-The package currently only supports English, but I am open to PRs for other languages.
-
-```bash
-php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=translations
-```
-
-
-## Usage
-
-In the view where you want to display comments, place this code and modify it:
-
-```
-@comments(['model' => $book])
-```
-
-In the example above we are setting the `commentable_type` to the class of the book. We are also passing the `commentable_id` the `id` of the book so that we know to which book the comments relate to. Behind the scenes, the package detects the currently logged in user if any.
-
-If you open the page containing the view where you have placed the above code, you should see a working comments form.
-
-
-### View only approved comments
-
-To view only approved comments, use this code:
-
-```
+```blade
 @comments([
-    'model' => $book,
-    'approved' => true
+    'model'                => $post,       // required — the commentable model
+    'approved'             => true,        // show only approved comments (default: all)
+    'perPage'              => 10,          // paginate top-level comments
+    'maxIndentationLevel'  => 3,           // override max reply nesting (default: config value)
+    'reactionsEnabled'     => true,        // override config
+    'reactionTypes'        => ['like', 'dislike'], // override config
+    'sort'                 => 'latest',    // 'latest' or 'oldest'
 ])
 ```
 
+### Pagination
 
-### Paginate comments
+Pagination applies to top-level comments only. A parent comment and all of its replies count as one "page unit" — so `perPage => 2` shows two parent comments plus all their children.
 
-Pagination paginates by top level comments only, meaning that if you specify the number of comments per page to be 1, and that one comment has 100 replies, it will display that one comment and all of its replies.
+### Nesting depth
 
-It was not possible to do it any other way, because if I paginate by all comments (parent and child) you will end up with blank pages since the comments components loops parent comments first and then uses recursion for replies.
-
-To use pagination, use this code:
-
-```
-@comments([
-    'model' => $user,
-    'perPage' => 2
-])
-```
-
-Replace `2` with any number you want.
-
-### Configure maximum indentation level
-
-By default the replies go up to level three. After that they are "mashed" at that level.
+By default replies nest up to level 3:
 
 ```
 - 0
@@ -202,69 +113,237 @@ By default the replies go up to level three. After that they are "mashed" at tha
             - 3
 ```
 
-You can configure the maximum indentation level like so:
+Replies beyond the max depth are shown at the deepest level. Override per-component with `maxIndentationLevel` or globally via config (`max_depth`).
 
+
+## Configuration
+
+Publish the config file:
+
+```bash
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=config
 ```
-@comments([
-    'model' => $user,
-    'maxIndentationLevel' => 1
-])
+
+Key options in `config/comments.php`:
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `model` | `Comment::class` | Custom Comment model |
+| `reaction_model` | `CommentReaction::class` | Custom reaction model |
+| `controller` | `WebCommentController::class` | Custom controller |
+| `routes` | `true` | Register package routes |
+| `load_migrations` | `true` | Auto-load package migrations |
+| `approval_required` | `false` | Require admin approval before comments are visible |
+| `guest_commenting` | `true` | Allow unauthenticated users to comment |
+| `soft_deletes` | `false` | Use soft deletes instead of hard deletes |
+| `max_depth` | `3` | Maximum reply nesting level |
+| `sort` | `'latest'` | Default comment sort (`'latest'` or `'oldest'`) |
+| `reactions.enabled` | `true` | Enable the reactions system |
+| `reactions.types` | `['like', 'dislike']` | Allowed reaction types |
+| `rate_limiting.enabled` | `true` | Enable rate limiting on comment submission |
+| `rate_limiting.max_attempts` | `10` | Max submissions per window |
+| `rate_limiting.decay_minutes` | `1` | Rate limit window in minutes |
+| `middleware` | `['web']` | Middleware applied to comment routes |
+| `permissions` | Array | Gate → policy method mappings |
+| `validation.*` | Array | Override validation rules for each action |
+| `response_status` | Array | HTTP status codes for create/update/delete |
+| `response_messages` | Array | Response message strings |
+
+
+## Publishing Assets
+
+```bash
+# Views
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=views
+
+# Migrations
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=migrations
+
+# Translations
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=translations
+
+# All at once
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=comments
+```
+
+
+## Authorization
+
+The package registers Laravel gates backed by `CommentPolicy`:
+
+| Gate | Default rule |
+|------|-------------|
+| `create-comment` | Any authenticated user |
+| `edit-comment` | Comment author only |
+| `delete-comment` | Comment author or user with `is_admin = true` |
+| `reply-to-comment` | Any authenticated user (cannot reply to own comment) |
+
+You can override the gate-to-policy mappings in `config/comments.php` under `permissions`, or publish and modify `CommentPolicy` directly.
+
+
+## Reactions
+
+Reactions are enabled by default. Each user can have one reaction per comment. Sending the same reaction type again removes it (toggle). Sending a different type switches it.
+
+Configure types in `config/comments.php`:
+
+```php
+'reactions' => [
+    'enabled' => true,
+    'types'   => ['like', 'dislike'],
+],
+```
+
+Any string values are valid reaction types.
+
+
+## Guest Commenting
+
+When `guest_commenting` is enabled, unauthenticated users can submit comments with a `guest_name` and `guest_email`. Honeypot spam protection (via `spatie/laravel-honeypot`) is automatically applied.
+
+Disable guest commenting to show a login prompt instead:
+
+```php
+'guest_commenting' => false,
 ```
 
 
 ## Events
 
-This package fires events to let you know when things happen.
+The package dispatches the following events (all implement `SerializesModels` for queued listeners):
 
-- `Anil\Comments\Events\CommentCreated`
-- `Anil\Comments\Events\CommentUpdated`
-- `Anil\Comments\Events\CommentDeleted`
+| Event | Fired when |
+|-------|-----------|
+| `Anil\Comments\Events\CommentCreated` | A comment is created |
+| `Anil\Comments\Events\CommentUpdated` | A comment is edited |
+| `Anil\Comments\Events\CommentDeleted` | A comment is deleted |
+
+Register listeners in your `EventServiceProvider` as normal.
 
 
 ## REST API
 
-To change the controller or the routes, see the config.
+All routes are prefixed with `/comments` and named with `comments.*`.
 
-```
-Route::post('comments', '\Anil\Comments\CommentController@store')->name('comments.store');
-Route::delete('comments/{comment}', '\Anil\Comments\CommentController@destroy')->name('comments.destroy');
-Route::put('comments/{comment}', '\Anil\Comments\CommentController@update')->name('comments.update');
-Route::post('comments/{comment}', '\Anil\Comments\CommentController@reply')->name('comments.reply');
-```
-
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| POST | `/comments` | `comments.store` | Create a comment |
+| PUT | `/comments/{comment}` | `comments.update` | Edit a comment |
+| DELETE | `/comments/{comment}` | `comments.destroy` | Delete a comment |
+| POST | `/comments/{comment}` | `comments.reply` | Reply to a comment |
+| POST | `/comments/{comment}/react` | `comments.react` | Toggle a reaction |
 
 ### POST `/comments`
 
-Request data:
-
+```json
+{
+    "commentable_type": "App\\Models\\Post",
+    "commentable_id": "1",
+    "message": "Great post!"
+}
 ```
-'commentable_type' => 'required|string',
-'commentable_id' => 'required|string|min:1',
-'message' => 'required|string'
-```
 
+Guest fields (required when unauthenticated and guest commenting is enabled):
+
+```json
+{
+    "guest_name": "Jane Doe",
+    "guest_email": "jane@example.com"
+}
+```
 
 ### PUT `/comments/{comment}`
 
-- {comment} - Comment ID.
-
-Request data:
-
-```
-'message' => 'required|string'
+```json
+{
+    "message": "Updated comment text."
+}
 ```
 
+### POST `/comments/{comment}` (reply)
 
-### POST `/comments/{comment}`
-
-- {comment} - Comment ID.
-
-Request data:
-
+```json
+{
+    "message": "Reply text."
+}
 ```
-'message' => 'required|string'
+
+### POST `/comments/{comment}/react`
+
+```json
+{
+    "type": "like"
+}
 ```
+
+Returns:
+
+```json
+{
+    "reaction_counts": { "like": 3, "dislike": 1 },
+    "user_reaction": "like"
+}
+```
+
+
+## Queryable Methods (Commentable trait)
+
+These methods are available on any model using the `Commentable` trait:
+
+```php
+$post->comments();                                // all comments
+$post->approvedComments();                        // only approved
+$post->latestComments(5);                         // 5 most recent
+$post->commentsWithReplies();                     // top-level + eager-loaded replies
+$post->totalComments();                           // count
+$post->commentsByUser($userId, $commenterType);   // filter by user
+$post->commentsInDateRange($start, $end);         // date range
+$post->commentsWithAttributes(['approved' => true]);
+$post->commentsWithRelations(['commenter']);
+
+Post::mostCommented(5);                           // static — top 5 most commented
+```
+
+
+## Lifecycle Hooks
+
+You can define these methods on your **Comment model** (after publishing and extending) or on your **commentable model** to run custom logic around comment operations:
+
+| Method | Trigger |
+|--------|---------|
+| `afterCreateProcess()` | After a comment is created |
+| `afterUpdateProcess()` | After a comment is updated |
+| `beforeDeleteProcess()` | Before a comment is deleted |
+| `afterDeleteProcess()` | After a comment is deleted |
+| `afterReplyProcess()` | After a reply is created |
+
+The service layer calls these hooks when they exist — no base implementation is required.
+
+
+## Localization
+
+The package ships with translations for 13 locales:
+
+`ar`, `ca`, `de`, `en`, `es`, `fr`, `in`, `it`, `ja`, `nl`, `np`, `pt`, `ru`
+
+Publish translations to customize or add new locales:
+
+```bash
+php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=translations
+```
+
+
+## Custom Controller
+
+To extend or replace the controller, set the `controller` key in config:
+
+```php
+'controller' => \App\Http\Controllers\MyCommentController::class,
+```
+
+Your controller must implement `Anil\Comments\CommentControllerInterface` or extend `Anil\Comments\CommentController`.
+
 
 ## License
 
-Comments is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT — see [LICENSE](https://opensource.org/licenses/MIT).
