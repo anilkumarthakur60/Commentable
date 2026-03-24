@@ -3,6 +3,7 @@
 namespace Anil\Comments;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -28,15 +29,15 @@ class CommentService
         $guestRules = [];
         if (! $request->user()) {
             $guestRules = [
-                'guest_name'  => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
+                'guest_name' => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
                 'guest_email' => Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']),
             ];
         }
 
         Validator::make($request->all(), array_merge($guestRules, [
             'commentable_type' => ['required', 'string'],
-            'commentable_id'   => ['required', 'min:1'],
-            'message'          => Config::get('comments.validation.message', ['required', 'string']),
+            'commentable_id' => ['required', 'min:1'],
+            'message' => Config::get('comments.validation.message', ['required', 'string']),
         ]))->validate();
 
         /** @var class-string<Model> $commentableClass */
@@ -50,17 +51,17 @@ class CommentService
 
         return DB::transaction(function () use ($request, $model, $commentClass): Comment {
             /** @var Comment $comment */
-            $comment = new $commentClass();
+            $comment = new $commentClass;
 
             if (! $request->user()) {
-                $comment->guest_name  = $request->string('guest_name')->toString();
+                $comment->guest_name = $request->string('guest_name')->toString();
                 $comment->guest_email = $request->string('guest_email')->toString();
             } else {
                 $comment->commenter()->associate($request->user());
             }
 
             $comment->commentable()->associate($model);
-            $comment->comment  = $request->string('message')->toString();
+            $comment->comment = $request->string('message')->toString();
             $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
@@ -142,11 +143,11 @@ class CommentService
 
         return DB::transaction(function () use ($request, $comment, $commentClass): Comment {
             /** @var Comment $reply */
-            $reply = new $commentClass();
+            $reply = new $commentClass;
             $reply->commenter()->associate(Auth::user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
-            $reply->comment  = $request->string('message')->toString();
+            $reply->comment = $request->string('message')->toString();
             $reply->approved = ! Config::get('comments.approval_required');
             $reply->save();
 
@@ -180,11 +181,11 @@ class CommentService
             'type' => ['required', 'string', Rule::in($allowedTypes)],
         ])->validate();
 
-        /** @var \Illuminate\Foundation\Auth\User $user */
-        $user        = Auth::user();
-        $reactorId   = $user->getKey();
+        /** @var User $user */
+        $user = Auth::user();
+        $reactorId = $user->getKey();
         $reactorType = $user->getMorphClass();
-        $type        = $request->string('type')->toString();
+        $type = $request->string('type')->toString();
 
         /** @var class-string<CommentReaction> $reactionClass */
         $reactionClass = Config::get('comments.reaction_model', CommentReaction::class);
@@ -205,10 +206,10 @@ class CommentService
             }
         } else {
             $reactionClass::create([
-                'comment_id'   => $comment->getKey(),
-                'reactor_id'   => $reactorId,
+                'comment_id' => $comment->getKey(),
+                'reactor_id' => $reactorId,
                 'reactor_type' => $reactorType,
-                'type'         => $type,
+                'type' => $type,
             ]);
             $userReaction = $type;
         }
@@ -227,7 +228,7 @@ class CommentService
         }
 
         return [
-            'reactions'     => $counts,
+            'reactions' => $counts,
             'user_reaction' => $userReaction,
         ];
     }

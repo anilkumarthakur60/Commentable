@@ -34,7 +34,7 @@ class WebCommentController extends CommentController implements CommentControlle
                 ->setStatusCode(Config::get('comments.response_status.created', 201));
         }
 
-        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$comment->getKey())
             ->with('success', Config::get('comments.response_messages.created'));
     }
 
@@ -53,7 +53,7 @@ class WebCommentController extends CommentController implements CommentControlle
                 ->setStatusCode(Config::get('comments.response_status.updated', 200));
         }
 
-        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$comment->getKey())
             ->with('success', Config::get('comments.response_messages.updated'));
     }
 
@@ -102,7 +102,7 @@ class WebCommentController extends CommentController implements CommentControlle
             return response()->json($result);
         }
 
-        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey());
+        return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
     }
 
     /**
@@ -120,7 +120,7 @@ class WebCommentController extends CommentController implements CommentControlle
                 ->setStatusCode(Config::get('comments.response_status.created', 201));
         }
 
-        return Redirect::to(URL::previous() . '#comment-' . $reply->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$reply->getKey())
             ->with('success', Config::get('comments.response_messages.created'));
     }
 }

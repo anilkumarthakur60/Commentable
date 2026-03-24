@@ -17,7 +17,7 @@ class ServiceProvider extends LaravelServiceProvider
     protected function loadRoutes(): void
     {
         if (Config::get('comments.routes') === true) {
-            $this->loadRoutesFrom(__DIR__ . '/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/routes.php');
         }
     }
 
@@ -27,7 +27,7 @@ class ServiceProvider extends LaravelServiceProvider
     protected function loadMigrations(): void
     {
         if (Config::get('comments.load_migrations') === true) {
-            $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../migrations');
         }
     }
 
@@ -49,8 +49,8 @@ class ServiceProvider extends LaravelServiceProvider
         $this->loadRoutes();
         $this->loadMigrations();
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'comments');
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'comments');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'comments');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'comments');
 
         // Single framework-agnostic theme (pure CSS, no Bootstrap/Tailwind required).
         Blade::include('comments::comments.comments', 'comments');
@@ -62,33 +62,33 @@ class ServiceProvider extends LaravelServiceProvider
         Route::model('comment', $model);
 
         $this->publishes([
-            __DIR__ . '/../migrations/' => App::databasePath('migrations'),
+            __DIR__.'/../migrations/' => App::databasePath('migrations'),
         ], 'comments-migrations');
 
         $this->publishes([
-            __DIR__ . '/../resources/views' => App::resourcePath('views/vendor/comments'),
+            __DIR__.'/../resources/views' => App::resourcePath('views/vendor/comments'),
         ], 'comments-views');
 
         $this->publishes([
-            __DIR__ . '/../config/comments.php' => App::configPath('comments.php'),
+            __DIR__.'/../config/comments.php' => App::configPath('comments.php'),
         ], 'comments-config');
 
         $this->publishes([
-            __DIR__ . '/../resources/lang' => App::resourcePath('lang/vendor/comments'),
+            __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
         ], 'comments-translations');
 
         $this->publishes([
-            __DIR__ . '/../migrations/'         => App::databasePath('migrations'),
-            __DIR__ . '/../resources/views'     => App::resourcePath('views/vendor/comments'),
-            __DIR__ . '/../config/comments.php' => App::configPath('comments.php'),
-            __DIR__ . '/../resources/lang'      => App::resourcePath('lang/vendor/comments'),
+            __DIR__.'/../migrations/' => App::databasePath('migrations'),
+            __DIR__.'/../resources/views' => App::resourcePath('views/vendor/comments'),
+            __DIR__.'/../config/comments.php' => App::configPath('comments.php'),
+            __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
         ], 'comments');
     }
 
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/comments.php',
+            __DIR__.'/../config/comments.php',
             'comments'
         );
     }

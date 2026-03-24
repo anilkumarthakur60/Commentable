@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int|string $id
  * @property int|string $comment_id
  * @property int|string $reactor_id
- * @property string     $reactor_type
- * @property string     $type  like|dislike
+ * @property string $reactor_type
+ * @property string $type like|dislike
  */
 class CommentReaction extends Model
 {
