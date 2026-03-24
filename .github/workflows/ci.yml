@@ -72,7 +72,7 @@ jobs:
           DB_DATABASE: commentable
           DB_USERNAME: root
           DB_PASSWORD: password
-        run: vendor/bin/pest --parallel
+        run: vendor/bin/pest
 
   stan:
     name: Static Analysis
