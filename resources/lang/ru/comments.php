@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'Введите ваше сообщение здесь:',
     'enter_your_email_here'            => 'Введите ваш email здесь:',
     'enter_your_name_here'             => 'Введите ваше имя здесь:',
+    'leave_a_comment'                  => 'Leave a comment',
+    'replying_to'                      => 'Replying to :name',
+    'anonymous'                        => 'Anonymous',
+    'pending_approval'                 => 'Pending approval',
+    'confirm_delete'                   => 'Are you sure you want to delete this comment?',
 ];

@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'أدخل تعليقك:',
     'enter_your_email_here'            => 'بريدك الإلكتروني:',
     'enter_your_name_here'             => 'اسمك:',
+    'leave_a_comment'                  => 'أضف تعليقًا',
+    'replying_to'                      => 'ردًا على :name',
+    'anonymous'                        => 'مجهول',
+    'pending_approval'                 => 'في انتظار الموافقة',
+    'confirm_delete'                   => 'هل أنت متأكد من حذف هذا التعليق؟',
 ];

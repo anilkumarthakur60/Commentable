@@ -12,27 +12,32 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $comment
- * @property bool   $approved
- * @property string $guest_name
- * @property string $guest_email
- * @property string $commentable_type
- * @property string $commentable_id
- * @property string $child_id
- * @property string $commenter_id
+ * @property int|string    $id
+ * @property string        $comment
+ * @property bool          $approved
+ * @property string|null   $guest_name
+ * @property string|null   $guest_email
+ * @property string        $commentable_type
+ * @property int|string    $commentable_id
+ * @property int|string|null $child_id
+ * @property int|string|null $commenter_id
+ * @property string|null   $commenter_type
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read Model|null $commenter
+ * @property-read Model|null $commentable
  */
 class Comment extends Model
 {
     use SoftDeletes;
 
     /**
-     * The relations to an eager load on every query.
+     * The relations to eager load on every query.
      *
      * @var list<string>
      */
-    protected $with = [
-        'commenter',
-    ];
+    protected $with = ['commenter'];
 
     /**
      * The attributes that are mass assignable.
@@ -58,7 +63,7 @@ class Comment extends Model
     /**
      * The event map for the model.
      *
-     * @var array<string, string>
+     * @var array<string, class-string>
      */
     protected $dispatchesEvents = [
         'created' => CommentCreated::class,
@@ -69,38 +74,33 @@ class Comment extends Model
     /**
      * The user who posted the comment.
      *
-     * @return MorphTo<Model, Comment>
+     * @return MorphTo<Model, $this>
      */
     public function commenter(): MorphTo
     {
-        /** @var MorphTo<Model, Comment> */
         return $this->morphTo();
     }
 
     /**
      * The model that was commented upon.
      *
-     * @return MorphTo<Model, Comment>
+     * @return MorphTo<Model, $this>
      */
     public function commentable(): MorphTo
     {
-        /** @var MorphTo<Model, Comment> */
         return $this->morphTo();
     }
 
     /**
-     * Returns all comments that this comment is the parent of.
+     * Returns all direct replies to this comment.
      *
-     * @return HasMany<Comment, Comment>
+     * @return HasMany<Comment, $this>
      */
     public function children(): HasMany
     {
-        /**
-         * @var class-string<Comment> $commentModel
-         */
+        /** @var class-string<Comment> $commentModel */
         $commentModel = config('comments.model');
 
-        /** @var HasMany<Comment, Comment> */
         return $this->hasMany(
             related: $commentModel,
             foreignKey: 'child_id',
@@ -109,22 +109,66 @@ class Comment extends Model
     }
 
     /**
-     * Returns the comment to which this comment belongs to.
+     * Returns the parent comment this comment is a reply to.
      *
-     * @return BelongsTo<Comment, Comment>
+     * @return BelongsTo<Comment, $this>
      */
     public function parent(): BelongsTo
     {
-        /**
-         * @var class-string<Comment> $commentModel
-         */
+        /** @var class-string<Comment> $commentModel */
         $commentModel = config('comments.model');
 
-        /** @var BelongsTo<Comment, Comment> */
         return $this->belongsTo(
             related: $commentModel,
             foreignKey: 'child_id',
             ownerKey: 'id'
         );
+    }
+
+    /**
+     * Returns the Gravatar URL for the comment author.
+     *
+     * Falls back to the "mystery person" avatar (d=mp) when no email is found.
+     */
+    public function getAvatarUrl(int $size = 64): string
+    {
+        $email = '';
+        $commenter = $this->commenter;
+        if ($commenter !== null) {
+            $email = (string) $commenter->getAttribute('email');
+        } elseif ($this->guest_email !== null) {
+            $email = $this->guest_email;
+        }
+
+        $hash = md5(strtolower(trim($email)));
+
+        return "https://www.gravatar.com/avatar/{$hash}.jpg?s={$size}&d=mp";
+    }
+
+    /**
+     * Returns the display name for the comment author.
+     */
+    public function getAuthorName(): string
+    {
+        $commenter = $this->commenter;
+        if ($commenter !== null) {
+            return (string) $commenter->getAttribute('name');
+        }
+
+        if ($this->guest_name !== null) {
+            return $this->guest_name;
+        }
+
+        $translation = __('comments::comments.anonymous');
+
+        return is_string($translation) ? $translation : 'Anonymous';
+    }
+
+    /**
+     * Whether this comment was posted by a guest (unauthenticated user).
+     */
+    public function isGuestComment(): bool
+    {
+        return $this->commenter_id === null;
     }
 }

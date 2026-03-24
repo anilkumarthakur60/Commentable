@@ -2,57 +2,61 @@
 
 namespace Anil\Comments;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
 /**
- * Add this trait to any model that you want to be able to
- * comment upon or get comments for.
+ * Add this trait to any model that you want to be commentable.
+ *
+ * @mixin Model
  */
 trait Commentable
 {
     /**
-     * This static method does voodoo magic to
-     * delete leftover comments once the commentable
-     * model is deleted.
+     * Delete all comments when the commentable model is deleted.
      */
     protected static function bootCommentable(): void
     {
-        static::deleted(function ($commentable) {
-            foreach ($commentable->comments as $comment) {
+        static::deleted(function (self $commentable): void {
+            $commentable->comments()->each(function (Comment $comment): void {
                 $comment->delete();
-            }
+            });
         });
     }
 
     /**
      * Returns all comments for this model.
      *
-     * @return MorphMany<Comment, Commentable>
+     * @return MorphMany<Comment, $this>
      */
     public function comments(): MorphMany
     {
-        /** @var MorphMany<Comment, Commentable> */
-        return $this->morphMany(Config::get('comments.model'), 'commentable');
+        /** @var class-string<Comment> $model */
+        $model = Config::get('comments.model');
+
+        return $this->morphMany($model, 'commentable');
     }
 
     /**
-     * Returns only approved comments for this model.
+     * Returns only approved (or unapproved) comments for this model.
      *
-     * @return MorphMany<Comment, Commentable>
+     * @return MorphMany<Comment, $this>
      */
     public function approvedComments(bool $approved = true): MorphMany
     {
-        /** @var MorphMany<Comment, Commentable> */
         return $this->comments()->where('approved', $approved);
     }
 
     /**
-     * Get the latest comments for this model.
+     * Get the $limit most recent comments for this model.
+     *
+     * @return Collection<int, Comment>
      */
     public function latestComments(int $limit = 5): Collection
     {
+        /** @var Collection<int, Comment> */
         return $this->comments()
             ->latest()
             ->take($limit)
@@ -60,10 +64,13 @@ trait Commentable
     }
 
     /**
-     * Get the most commented models.
+     * Get the models with the highest comment count.
+     *
+     * @return Collection<int, static>
      */
     public static function mostCommented(int $limit = 5): Collection
     {
+        /** @var Collection<int, static> */
         return static::withCount('comments')
             ->orderByDesc('comments_count')
             ->take($limit)
@@ -71,10 +78,13 @@ trait Commentable
     }
 
     /**
-     * Get comments with their replies in a nested structure.
+     * Get top-level comments with their nested replies eager-loaded.
+     *
+     * @return Collection<int, Comment>
      */
     public function commentsWithReplies(): Collection
     {
+        /** @var Collection<int, Comment> */
         return $this->comments()
             ->whereNull('child_id')
             ->with(['children', 'commenter'])
@@ -90,23 +100,25 @@ trait Commentable
     }
 
     /**
-     * Get comments by a specific user.
+     * Get comments posted by a specific commenter.
+     *
+     * @return MorphMany<Comment, $this>
      */
-    public function commentsByUser(int $userId, string $commenterType): MorphMany
+    public function commentsByUser(int|string $userId, string $commenterType): MorphMany
     {
-        return $this->comments()->where('commenter_id', $userId)
+        return $this->comments()
+            ->where('commenter_id', $userId)
             ->where('commenter_type', $commenterType);
     }
 
     /**
-     * Get comments created within a specific date range.
+     * Get comments created within a date range (inclusive).
+     *
+     * @return MorphMany<Comment, $this>
      */
     public function commentsInDateRange(string $startDate, ?string $endDate = null): MorphMany
     {
-        // if end is null, set it to the current date
-        if ($endDate === null) {
-            $endDate = $startDate;
-        }
+        $endDate ??= $startDate;
 
         return $this->comments()
             ->whereDate('created_at', '>=', $startDate)
@@ -114,7 +126,10 @@ trait Commentable
     }
 
     /**
-     * Get comments with specific attributes.
+     * Get comments matching specific column/value pairs.
+     *
+     * @param  array<string, mixed> $attributes
+     * @return MorphMany<Comment, $this>
      */
     public function commentsWithAttributes(array $attributes): MorphMany
     {
@@ -122,7 +137,10 @@ trait Commentable
     }
 
     /**
-     * Get comments with their related data.
+     * Get comments with the given relationships eager-loaded.
+     *
+     * @param  list<string>|array<string, mixed> $relations
+     * @return MorphMany<Comment, $this>
      */
     public function commentsWithRelations(array $relations): MorphMany
     {

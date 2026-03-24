@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'メッセージをここに入力：',
     'enter_your_email_here'            => 'メールアドレスをここに入力：',
     'enter_your_name_here'             => 'お名前をここに入力：',
+    'leave_a_comment'                  => 'Leave a comment',
+    'replying_to'                      => 'Replying to :name',
+    'anonymous'                        => 'Anonymous',
+    'pending_approval'                 => 'Pending approval',
+    'confirm_delete'                   => 'Are you sure you want to delete this comment?',
 ];

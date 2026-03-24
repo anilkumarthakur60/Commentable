@@ -9,15 +9,7 @@ class CommentUpdated
 {
     use SerializesModels;
 
-    public Comment $comment;
-
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct(Comment $comment)
-    {
-        $this->comment = $comment;
-    }
+    public function __construct(
+        public readonly Comment $comment
+    ) {}
 }

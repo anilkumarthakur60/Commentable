@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'Geben Sie Ihre Nachricht hier ein:',
     'enter_your_email_here'            => 'Geben Sie Ihre E-Mail hier ein:',
     'enter_your_name_here'             => 'Geben Sie Ihren Namen hier ein:',
+    'leave_a_comment'                  => 'Einen Kommentar hinterlassen',
+    'replying_to'                      => 'Antwort an :name',
+    'anonymous'                        => 'Anonym',
+    'pending_approval'                 => 'Ausstehende Genehmigung',
+    'confirm_delete'                   => 'Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?',
 ];

@@ -13,7 +13,7 @@ use Throwable;
 class WebCommentController extends CommentController
 {
     public function __construct(
-        public CommentService $commentService
+        public readonly CommentService $commentService
     ) {
         parent::__construct();
     }
@@ -26,17 +26,15 @@ class WebCommentController extends CommentController
     public function store(Request $request): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->store($request);
+
         if ($request->wantsJson()) {
-            return CommentResource::make($comment);
+            return CommentResource::make($comment)
+                ->response()
+                ->setStatusCode(Config::get('comments.response_status.created', 201));
         }
 
-        /**
-         * @var string $key
-         */
-        $key = $comment->getKey();
-        $redirectUrl = URL::previous().'#comment-'.$key;
-
-        return Redirect::to($redirectUrl);
+        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey())
+            ->with('success', Config::get('comments.response_messages.created'));
     }
 
     /**
@@ -47,17 +45,15 @@ class WebCommentController extends CommentController
     public function update(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->update($request, $comment);
+
         if ($request->wantsJson()) {
-            return CommentResource::make($comment);
+            return CommentResource::make($comment)
+                ->response()
+                ->setStatusCode(Config::get('comments.response_status.updated', 200));
         }
 
-        /**
-         * @var string $key
-         */
-        $key = $comment->getKey();
-        $redirectUrl = URL::previous().'#comment-'.$key;
-
-        return Redirect::to($redirectUrl);
+        return Redirect::to(URL::previous() . '#comment-' . $comment->getKey())
+            ->with('success', Config::get('comments.response_messages.updated'));
     }
 
     /**
@@ -68,33 +64,34 @@ class WebCommentController extends CommentController
     public function destroy(Request $request, Comment $comment): RedirectResponse|JsonResponse
     {
         $this->commentService->destroy($comment);
+
         if ($request->wantsJson()) {
-            return response()->json([
-                'message' => Config::get('comments.response_messages.deleted'),
-            ], Config::get('comments.response_status.deleted'));
+            return response()->json(
+                ['message' => Config::get('comments.response_messages.deleted')],
+                Config::get('comments.response_status.deleted', 200)
+            );
         }
 
-        return Redirect::back();
+        return Redirect::back()
+            ->with('success', Config::get('comments.response_messages.deleted'));
     }
 
     /**
-     * Creates a reply "comment" to a comment.
+     * Creates a reply to an existing comment.
      *
      * @throws Throwable
      */
     public function reply(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $reply = $this->commentService->reply($request, $comment);
+
         if ($request->wantsJson()) {
-            return CommentResource::make($reply);
+            return CommentResource::make($reply)
+                ->response()
+                ->setStatusCode(Config::get('comments.response_status.created', 201));
         }
 
-        /**
-         * @var string $key
-         */
-        $key = $reply->getKey();
-        $redirectUrl = URL::previous().'#comment-'.$key;
-
-        return Redirect::to($redirectUrl);
+        return Redirect::to(URL::previous() . '#comment-' . $reply->getKey())
+            ->with('success', Config::get('comments.response_messages.created'));
     }
 }

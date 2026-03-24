@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'आफ्नो सन्देश यहाँ लेख्नुहोस्:',
     'enter_your_email_here'            => 'आफ्नो इमेल यहाँ लेख्नुहोस्:',
     'enter_your_name_here'             => 'आफ्नो नाम यहाँ लेख्नुहोस्:',
+    'leave_a_comment'                  => 'Leave a comment',
+    'replying_to'                      => 'Replying to :name',
+    'anonymous'                        => 'Anonymous',
+    'pending_approval'                 => 'Pending approval',
+    'confirm_delete'                   => 'Are you sure you want to delete this comment?',
 ];

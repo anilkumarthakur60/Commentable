@@ -2,7 +2,6 @@
 
 namespace Anil\Comments;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,107 +16,65 @@ class CommentService
     /**
      * Handles creating a new comment for a given model.
      *
-     *
      * @throws Throwable
      */
     public function store(Request $request): Comment
     {
-        // If guest commenting is turned off, authorize this action.
-        if (!Config::get('comments.guest_commenting')) {
+        // If guest commenting is disabled, the user must be authenticated and authorised.
+        if (! Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
-        // Define guest rules if a user is not logged in.
-        if (!$request->user()) {
-            $guest_rules = [
-                'guest_name' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-                'guest_email' => [
-                    'required',
-                    'string',
-                    'email',
-                    'max:255',
-                ],
+        // Build validation rules — guests must supply name + email.
+        $guestRules = [];
+        if (! $request->user()) {
+            $guestRules = [
+                'guest_name' => ['required', 'string', 'max:255'],
+                'guest_email' => ['required', 'string', 'email', 'max:255'],
             ];
         }
 
-        // Merge guest rules, if any, with normal validation rules.
-        Validator::make($request->all(), array_merge($guest_rules ?? [], [
-            'commentable_type' => [
-                'required',
-                'string',
-            ],
-            'commentable_id' => [
-                'required',
-                'min:1',
-            ],
-            'message' => 'required|string',
+        Validator::make($request->all(), array_merge($guestRules, [
+            'commentable_type' => ['required', 'string'],
+            'commentable_id'   => ['required', 'min:1'],
+            'message'          => ['required', 'string'],
         ]))->validate();
 
-        /**
-         * @var class-string<Model> $commentableModel
-         */
-        $commentableModel = $request->commentable_type;
-        /**
-         * @var Model $model
-         */
-        $model = $commentableModel::query()->findOrFail($request->commentable_id);
+        /** @var class-string<Model> $commentableClass */
+        $commentableClass = $request->string('commentable_type')->toString();
 
+        /** @var Model $model */
+        $model = $commentableClass::query()->findOrFail($request->input('commentable_id'));
+
+        /** @var class-string<Comment> $commentClass */
         $commentClass = Config::get('comments.model');
 
-        try {
-            DB::beginTransaction();
-            /**
-             * @var Comment $comment
-             */
+        return DB::transaction(function () use ($request, $model, $commentClass): Comment {
+            /** @var Comment $comment */
             $comment = new $commentClass();
 
-            /**
-             * @var string $guestName
-             */
-            $guestName = $request->guest_name;
-            /**
-             * @var string $guestEmail
-             */
-            $guestEmail = $request->guest_email;
-
-            if (!$request->user()) {
-                $comment->guest_name = $guestName;
-                $comment->guest_email = $guestEmail;
+            if (! $request->user()) {
+                $comment->guest_name  = $request->string('guest_name')->toString();
+                $comment->guest_email = $request->string('guest_email')->toString();
             } else {
                 $comment->commenter()->associate($request->user());
             }
 
-            /**
-             * @var string $message
-             */
-            $message = $request->message;
-
             $comment->commentable()->associate($model);
-            $comment->comment = $message;
-            $comment->approved = !Config::get('comments.approval_required');
+            $comment->comment  = $request->string('message')->toString();
+            $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
             if (method_exists($model, 'afterCreateProcess')) {
                 $model->afterCreateProcess();
             }
 
-            DB::commit();
-
             return $comment;
-        } catch (Exception $exception) {
-            DB::rollBack();
-
-            throw new Exception($exception);
-        }
+        });
     }
 
     /**
-     * Handles updating the message of the comment.
-     *
+     * Handles updating the message of an existing comment.
      *
      * @throws Throwable
      */
@@ -126,30 +83,24 @@ class CommentService
         Gate::authorize('edit-comment', $comment);
 
         Validator::make($request->all(), [
-            'message' => 'required|string',
+            'message' => ['required', 'string'],
         ])->validate();
 
-        try {
-            DB::beginTransaction();
+        return DB::transaction(function () use ($request, $comment): Comment {
             $comment->update([
-                'comment' => $request->message,
+                'comment' => $request->string('message')->toString(),
             ]);
 
             if (method_exists($comment, 'afterUpdateProcess')) {
                 $comment->afterUpdateProcess();
             }
 
-            DB::commit();
-
             return $comment;
-        } catch (Exception $exception) {
-            throw new Exception($exception);
-        }
+        });
     }
 
     /**
-     * Handles deleting a comment.
-     *
+     * Handles deleting a comment (soft or hard based on config).
      *
      * @throws Throwable
      */
@@ -157,8 +108,7 @@ class CommentService
     {
         Gate::authorize('delete-comment', $comment);
 
-        try {
-            DB::beginTransaction();
+        DB::transaction(function () use ($comment): void {
             if (method_exists($comment, 'beforeDeleteProcess')) {
                 $comment->beforeDeleteProcess();
             }
@@ -172,18 +122,11 @@ class CommentService
             if (method_exists($comment, 'afterDeleteProcess')) {
                 $comment->afterDeleteProcess();
             }
-
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            throw new Exception($e);
-        }
+        });
     }
 
     /**
-     * Handles creating a reply "comment" to a comment.
-     *
+     * Handles creating a reply to an existing comment.
      *
      * @throws Throwable
      */
@@ -192,47 +135,27 @@ class CommentService
         Gate::authorize('reply-to-comment', $comment);
 
         Validator::make($request->all(), [
-            'message' => [
-                'required',
-                'string',
-            ],
+            'message' => ['required', 'string'],
         ])->validate();
 
-        /**
-         * @var class-string<Comment> $commentClass
-         */
+        /** @var class-string<Comment> $commentClass */
         $commentClass = Config::get('comments.model');
 
-        try {
-            DB::beginTransaction();
-
-            /**
-             * @var string $message
-             */
-            $message = $request->message;
-
-            /**
-             * @var Comment $reply
-             */
+        return DB::transaction(function () use ($request, $comment, $commentClass): Comment {
+            /** @var Comment $reply */
             $reply = new $commentClass();
             $reply->commenter()->associate(Auth::user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
-            $reply->comment = $message;
-            $reply->approved = !Config::get('comments.approval_required');
+            $reply->comment  = $request->string('message')->toString();
+            $reply->approved = ! Config::get('comments.approval_required');
             $reply->save();
 
             if (method_exists($reply, 'afterReplyProcess')) {
                 $reply->afterReplyProcess();
             }
 
-            DB::commit();
-
             return $reply;
-        } catch (Exception $exception) {
-            DB::rollBack();
-
-            throw new Exception($exception);
-        }
+        });
     }
 }

@@ -10,13 +10,23 @@ abstract class CommentController extends Controller implements CommentController
 {
     public function __construct()
     {
-        $this->middleware(Config::get('comments.middleware'));
+        /** @var list<string> $middleware */
+        $middleware = Config::get('comments.middleware', ['web']);
 
+        $this->middleware($middleware);
+
+        // When guest commenting is allowed, protect the store action against spam bots.
         if (Config::get('comments.guest_commenting')) {
-            $this->middleware(Config::get('comments.middleware'))->except('store');
             $this->middleware(ProtectAgainstSpam::class)->only('store');
-        } else {
-            $this->middleware(Config::get('comments.middleware'));
+        }
+
+        // Apply rate-limiting if configured.
+        if (Config::get('comments.rate_limiting.enabled')) {
+            /** @var int $maxAttempts */
+            $maxAttempts = Config::get('comments.rate_limiting.max_attempts', 10);
+            /** @var int $decayMinutes */
+            $decayMinutes = Config::get('comments.rate_limiting.decay_minutes', 1);
+            $this->middleware("throttle:{$maxAttempts},{$decayMinutes}")->only(['store', 'reply', 'update']);
         }
     }
 }

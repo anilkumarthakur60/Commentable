@@ -1,18 +1,19 @@
 includes:
     - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
 
 parameters:
+    level: 9
 
-    tips:
-        treatPhpDocTypesAsCertain: false
     paths:
         - src/
         - config/
         - migrations/
-    level: 9
 
-    excludePaths:
+    tips:
+        treatPhpDocTypesAsCertain: false
 
     ignoreErrors:
+        # Traits used only by host models — not analysed standalone
         - '#Trait .* is used zero times and is not analysed#'
+        # Builder::whereHas closure param is non-generic in Larastan
+        - '#Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Builder.*whereHas.*#'

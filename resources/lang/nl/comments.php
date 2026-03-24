@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'Voer uw bericht hier in:',
     'enter_your_email_here'            => 'Voer uw e-mail hier in:',
     'enter_your_name_here'             => 'Voer uw naam hier in:',
+    'leave_a_comment'                  => 'Leave a comment',
+    'replying_to'                      => 'Replying to :name',
+    'anonymous'                        => 'Anonymous',
+    'pending_approval'                 => 'Pending approval',
+    'confirm_delete'                   => 'Are you sure you want to delete this comment?',
 ];

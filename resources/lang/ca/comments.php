@@ -19,4 +19,9 @@ return [
     'enter_your_message_here'          => 'Introdueix el teu missatge aquí:',
     'enter_your_email_here'            => 'Introdueix el teu correu electrònic aquí:',
     'enter_your_name_here'             => 'Introduïu el vostre nom aquí:',
+    'leave_a_comment'                  => 'Leave a comment',
+    'replying_to'                      => 'Replying to :name',
+    'anonymous'                        => 'Anonymous',
+    'pending_approval'                 => 'Pending approval',
+    'confirm_delete'                   => 'Are you sure you want to delete this comment?',
 ];

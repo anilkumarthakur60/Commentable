@@ -2,6 +2,7 @@
 
 use Anil\Comments\Comment;
 use Anil\Comments\CommentPolicy;
+use Anil\Comments\Enums\UiTheme;
 use Anil\Comments\WebCommentController;
 
 return [
@@ -15,7 +16,7 @@ return [
 
     /**
      * You can customize the behaviour of these permissions by
-     * creating your own and pointing to it here.
+     * creating your own policy and pointing to it here.
      */
     'permissions' => [
         'create-comment'   => [CommentPolicy::class, 'create'],
@@ -48,10 +49,7 @@ return [
      *
      * To see only approved comments use this code in your view:
      *
-     * @comments([
-     *         'model' => $book,
-     *         'approved' => true
-     *     ])
+     * @comments(['model' => $book, 'approved' => true])
      */
     'approval_required' => false,
 
@@ -77,15 +75,34 @@ return [
     'load_migrations' => true,
 
     /**
-     * Enable/disable calling Paginator::useBootstrap() in the boot method
-     * to prevent breaking non bootstrap based Site.
+     * UI theme for comment views.
+     *
+     * Available options:
+     *   - 'bootstrap5'  Bootstrap 5 (default) — requires Bootstrap 5 JS/CSS
+     *   - 'bootstrap4'  Bootstrap 4 — requires Bootstrap 4 JS/CSS
+     *   - 'tailwind'    Tailwind CSS — requires Tailwind CSS; modals use native <dialog>
+     *
+     * For Bootstrap themes, the package automatically calls Paginator::useBootstrap().
      */
-    'paginator_use_bootstrap' => true,
+    'ui_theme' => UiTheme::Bootstrap5->value,
 
-    // middleware
+    /**
+     * Rate limiting for comment submission.
+     *
+     * Set `enabled` to true to throttle comment creation, replies, and updates.
+     * `max_attempts` — max requests per `decay_minutes` window per IP.
+     */
+    'rate_limiting' => [
+        'enabled'       => true,
+        'max_attempts'  => 10,
+        'decay_minutes' => 1,
+    ],
+
+    /**
+     * Middleware applied to all comment routes.
+     */
     'middleware' => [
         'web',
-        // 'api',
     ],
 
     'response_status' => [
@@ -95,9 +112,9 @@ return [
     ],
 
     'response_messages' => [
-        'created' => 'Comment created successfully',
-        'updated' => 'Comment updated successfully',
-        'deleted' => 'Comment deleted successfully',
+        'created' => 'Comment created successfully.',
+        'updated' => 'Comment updated successfully.',
+        'deleted' => 'Comment deleted successfully.',
     ],
 
 ];
