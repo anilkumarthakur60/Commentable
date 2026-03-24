@@ -3,6 +3,7 @@
 namespace Anil\Comments\Tests\TestSetup\Models;
 
 use Anil\Comments\Commentable;
+use Anil\Comments\Tests\TestSetup\Factories\PostModelFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

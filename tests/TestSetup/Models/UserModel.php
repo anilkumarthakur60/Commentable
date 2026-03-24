@@ -3,6 +3,7 @@
 namespace Anil\Comments\Tests\TestSetup\Models;
 
 use Anil\Comments\Commenter;
+use Anil\Comments\Tests\TestSetup\Factories\UserModelFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,10 +18,12 @@ use Illuminate\Support\Facades\Request;
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
  *
- * @method static Builder<Model> initializer(bool $orderBy = true)
- * @method static Builder<Model> paginates(int $perPage = 15)
- * @method static Builder<Model> simplePaginates(int $perPage = 15)
- * @method static Builder<Model> likeWhere(array<string> $attributes, ?string $searchTerm = null)
+ * @method static Builder<static> initializer(bool $orderBy = true)
+ * @method static Builder<static> paginates(int $perPage = 15)
+ * @method static Builder<static> simplePaginates(int $perPage = 15)
+ * @method Builder<static> initializer(bool $orderBy = true)
+ * @method Builder<static> paginates(int $perPage = 15)
+ * @method Builder<static> simplePaginates(int $perPage = 15)
  *
  * @mixin Builder<UserModel>
  */
@@ -71,10 +74,12 @@ class UserModel extends Authenticatable
      */
     public function scopeQueryFilter(Builder $query, mixed $search): Builder
     {
-        return $query->likeWhere(
-            attributes: ['name', 'email'],
-            searchTerm: $search
-        );
+        $callable = [$query, 'likeWhere'];
+
+        /** @var Builder<UserModel> */
+        return is_callable($callable)
+            ? call_user_func($callable, ['name', 'email'], $search)
+            : $query;
     }
 
     /**
