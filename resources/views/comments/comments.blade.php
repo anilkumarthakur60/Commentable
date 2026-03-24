@@ -31,7 +31,7 @@
         background: #ffffff;
         border-radius: 14px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, .07), 0 4px 16px rgba(0, 0, 0, .06);
-        padding: 36px 44px;
+        padding: 8px 8px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         font-size: 14px;
         color: #1a1a1a;
@@ -636,16 +636,6 @@
             <h2 class="cc-title">Comments</h2>
             <span class="cc-count-badge">{{ $allComments->count() }}</span>
         </div>
-        <button type="button" class="cc-sort-btn" aria-label="Sort comments">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
-            </svg>
-            {{ $configSort === 'oldest' ? 'Oldest first' : 'Most recent' }}
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-        </button>
     </div>
 
     @if($allComments->isEmpty())
