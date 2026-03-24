@@ -5,8 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: thursday
+      day: "thursday"
       time: "12:00"
+      timezone: "UTC"
     labels:
       - "dependencies"
     open-pull-requests-limit: 10
@@ -14,4 +15,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
+      day: "thursday"
+      time: "12:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
