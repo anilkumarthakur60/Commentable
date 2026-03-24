@@ -78,10 +78,10 @@ class ServiceProvider extends LaravelServiceProvider
         ], 'comments-translations');
 
         $this->publishes([
-            __DIR__.'/../migrations/' => App::databasePath('migrations'),
-            __DIR__.'/../resources/views' => App::resourcePath('views/vendor/comments'),
+            __DIR__.'/../migrations/'         => App::databasePath('migrations'),
+            __DIR__.'/../resources/views'     => App::resourcePath('views/vendor/comments'),
             __DIR__.'/../config/comments.php' => App::configPath('comments.php'),
-            __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
+            __DIR__.'/../resources/lang'      => App::resourcePath('lang/vendor/comments'),
         ], 'comments');
     }
 

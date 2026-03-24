@@ -31,9 +31,9 @@ return [
     | override any authorisation logic without touching the package source.
     */
     'permissions' => [
-        'create-comment' => [CommentPolicy::class, 'create'],
-        'delete-comment' => [CommentPolicy::class, 'delete'],
-        'edit-comment' => [CommentPolicy::class, 'update'],
+        'create-comment'   => [CommentPolicy::class, 'create'],
+        'delete-comment'   => [CommentPolicy::class, 'delete'],
+        'edit-comment'     => [CommentPolicy::class, 'update'],
         'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
 
@@ -107,7 +107,7 @@ return [
     */
     'reactions' => [
         'enabled' => true,
-        'types' => ['like', 'dislike'],
+        'types'   => ['like', 'dislike'],
     ],
 
     /*
@@ -118,8 +118,8 @@ return [
     | customise comment field constraints without touching the package source.
     */
     'validation' => [
-        'message' => ['required', 'string'],
-        'guest_name' => ['required', 'string', 'max:255'],
+        'message'     => ['required', 'string'],
+        'guest_name'  => ['required', 'string', 'max:255'],
         'guest_email' => ['required', 'string', 'email', 'max:255'],
     ],
 
@@ -148,8 +148,8 @@ return [
     | Throttle comment submission, replies, edits, and reactions per IP.
     */
     'rate_limiting' => [
-        'enabled' => true,
-        'max_attempts' => 10,
+        'enabled'       => true,
+        'max_attempts'  => 10,
         'decay_minutes' => 1,
     ],
 

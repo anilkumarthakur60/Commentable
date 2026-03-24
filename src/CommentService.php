@@ -22,22 +22,22 @@ class CommentService
      */
     public function store(Request $request): Comment
     {
-        if (! Config::get('comments.guest_commenting')) {
+        if (!Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
         $guestRules = [];
-        if (! $request->user()) {
+        if (!$request->user()) {
             $guestRules = [
-                'guest_name' => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
+                'guest_name'  => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
                 'guest_email' => Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']),
             ];
         }
 
         Validator::make($request->all(), array_merge($guestRules, [
             'commentable_type' => ['required', 'string'],
-            'commentable_id' => ['required', 'min:1'],
-            'message' => Config::get('comments.validation.message', ['required', 'string']),
+            'commentable_id'   => ['required', 'min:1'],
+            'message'          => Config::get('comments.validation.message', ['required', 'string']),
         ]))->validate();
 
         /** @var class-string<Model> $commentableClass */
@@ -51,9 +51,9 @@ class CommentService
 
         return DB::transaction(function () use ($request, $model, $commentClass): Comment {
             /** @var Comment $comment */
-            $comment = new $commentClass;
+            $comment = new $commentClass();
 
-            if (! $request->user()) {
+            if (!$request->user()) {
                 $comment->guest_name = $request->string('guest_name')->toString();
                 $comment->guest_email = $request->string('guest_email')->toString();
             } else {
@@ -62,7 +62,7 @@ class CommentService
 
             $comment->commentable()->associate($model);
             $comment->comment = $request->string('message')->toString();
-            $comment->approved = ! Config::get('comments.approval_required');
+            $comment->approved = !Config::get('comments.approval_required');
             $comment->save();
 
             if (method_exists($model, 'afterCreateProcess')) {
@@ -143,12 +143,12 @@ class CommentService
 
         return DB::transaction(function () use ($request, $comment, $commentClass): Comment {
             /** @var Comment $reply */
-            $reply = new $commentClass;
+            $reply = new $commentClass();
             $reply->commenter()->associate(Auth::user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $request->string('message')->toString();
-            $reply->approved = ! Config::get('comments.approval_required');
+            $reply->approved = !Config::get('comments.approval_required');
             $reply->save();
 
             if (method_exists($reply, 'afterReplyProcess')) {
@@ -206,10 +206,10 @@ class CommentService
             }
         } else {
             $reactionClass::create([
-                'comment_id' => $comment->getKey(),
-                'reactor_id' => $reactorId,
+                'comment_id'   => $comment->getKey(),
+                'reactor_id'   => $reactorId,
                 'reactor_type' => $reactorType,
-                'type' => $type,
+                'type'         => $type,
             ]);
             $userReaction = $type;
         }
@@ -228,7 +228,7 @@ class CommentService
         }
 
         return [
-            'reactions' => $counts,
+            'reactions'     => $counts,
             'user_reaction' => $userReaction,
         ];
     }

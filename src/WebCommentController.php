@@ -90,11 +90,11 @@ class WebCommentController extends CommentController implements CommentControlle
      */
     public function react(Request $request, Comment $comment): JsonResponse|RedirectResponse
     {
-        if (! Config::get('comments.reactions.enabled', true)) {
+        if (!Config::get('comments.reactions.enabled', true)) {
             abort(404);
         }
 
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             if ($request->wantsJson()) {
                 return response()->json(['message' => 'Unauthenticated.'], 401);
             }
