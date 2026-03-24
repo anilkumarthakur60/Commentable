@@ -29,12 +29,14 @@ class WebCommentController extends CommentController implements CommentControlle
         $comment = $this->commentService->store($request);
 
         if ($request->wantsJson()) {
+            $status = Config::get('comments.response_status.created', 201);
+
             return CommentResource::make($comment)
                 ->response()
-                ->setStatusCode(Config::get('comments.response_status.created', 201));
+                ->setStatusCode(is_int($status) ? $status : 201);
         }
 
-        return Redirect::to(URL::previous().'#comment-'.$comment->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$comment->id)
             ->with('success', Config::get('comments.response_messages.created'));
     }
 
@@ -48,12 +50,14 @@ class WebCommentController extends CommentController implements CommentControlle
         $comment = $this->commentService->update($request, $comment);
 
         if ($request->wantsJson()) {
+            $status = Config::get('comments.response_status.updated', 200);
+
             return CommentResource::make($comment)
                 ->response()
-                ->setStatusCode(Config::get('comments.response_status.updated', 200));
+                ->setStatusCode(is_int($status) ? $status : 200);
         }
 
-        return Redirect::to(URL::previous().'#comment-'.$comment->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$comment->id)
             ->with('success', Config::get('comments.response_messages.updated'));
     }
 
@@ -67,9 +71,11 @@ class WebCommentController extends CommentController implements CommentControlle
         $this->commentService->destroy($comment);
 
         if ($request->wantsJson()) {
+            $status = Config::get('comments.response_status.deleted', 200);
+
             return response()->json(
                 ['message' => Config::get('comments.response_messages.deleted')],
-                Config::get('comments.response_status.deleted', 200)
+                is_int($status) ? $status : 200
             );
         }
 
@@ -102,7 +108,7 @@ class WebCommentController extends CommentController implements CommentControlle
             return response()->json($result);
         }
 
-        return Redirect::to(URL::previous().'#comment-'.$comment->getKey());
+        return Redirect::to(URL::previous().'#comment-'.$comment->id);
     }
 
     /**
@@ -115,12 +121,14 @@ class WebCommentController extends CommentController implements CommentControlle
         $reply = $this->commentService->reply($request, $comment);
 
         if ($request->wantsJson()) {
+            $status = Config::get('comments.response_status.created', 201);
+
             return CommentResource::make($reply)
                 ->response()
-                ->setStatusCode(Config::get('comments.response_status.created', 201));
+                ->setStatusCode(is_int($status) ? $status : 201);
         }
 
-        return Redirect::to(URL::previous().'#comment-'.$reply->getKey())
+        return Redirect::to(URL::previous().'#comment-'.$reply->id)
             ->with('success', Config::get('comments.response_messages.created'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Anil\Comments;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
@@ -14,6 +15,20 @@ use Illuminate\Support\Facades\Config;
  */
 trait Commentable
 {
+    /**
+     * Get the models with the highest comment count.
+     *
+     * @return Collection<int, static>
+     */
+    public static function mostCommented(int $limit = 5): Collection
+    {
+        /** @var Collection<int, static> */
+        return static::withCount('comments')
+            ->orderByDesc('comments_count')
+            ->take($limit)
+            ->get();
+    }
+
     /**
      * Delete all comments when the commentable model is deleted.
      */
@@ -59,20 +74,6 @@ trait Commentable
         /** @var Collection<int, Comment> */
         return $this->comments()
             ->latest()
-            ->take($limit)
-            ->get();
-    }
-
-    /**
-     * Get the models with the highest comment count.
-     *
-     * @return Collection<int, static>
-     */
-    public static function mostCommented(int $limit = 5): Collection
-    {
-        /** @var Collection<int, static> */
-        return static::withCount('comments')
-            ->orderByDesc('comments_count')
             ->take($limit)
             ->get();
     }
@@ -139,7 +140,7 @@ trait Commentable
     /**
      * Get comments with the given relationships eager-loaded.
      *
-     * @param  list<string>|array<string, mixed>  $relations
+     * @param  array<int, string>|array<string, Closure>  $relations
      * @return MorphMany<Comment, $this>
      */
     public function commentsWithRelations(array $relations): MorphMany

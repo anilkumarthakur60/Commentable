@@ -8,12 +8,7 @@ parameters:
         - src/
         - config/
         - migrations/
+        - tests/TestSetup/Models/
 
     tips:
         treatPhpDocTypesAsCertain: false
-
-    ignoreErrors:
-        # Traits used only by host models — not analysed standalone
-        - '#Trait .* is used zero times and is not analysed#'
-        # Builder::whereHas closure param is non-generic in Larastan
-        - '#Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Builder.*whereHas.*#'

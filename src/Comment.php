@@ -136,7 +136,8 @@ class Comment extends Model
         $email = '';
         $commenter = $this->commenter;
         if ($commenter !== null) {
-            $email = (string) $commenter->getAttribute('email');
+            $commenterEmail = $commenter->getAttribute('email');
+            $email = is_string($commenterEmail) ? $commenterEmail : '';
         } elseif ($this->guest_email !== null) {
             $email = $this->guest_email;
         }
@@ -153,7 +154,9 @@ class Comment extends Model
     {
         $commenter = $this->commenter;
         if ($commenter !== null) {
-            return (string) $commenter->getAttribute('name');
+            $name = $commenter->getAttribute('name');
+
+            return is_string($name) ? $name : '';
         }
 
         if ($this->guest_name !== null) {
