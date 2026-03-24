@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('comment_id')->constrained()->cascadeOnDelete();
             $table->morphs('reactor');
-            $table->enum('type', ['like', 'dislike']);
+            $table->string('type');
             $table->timestamps();
 
             $table->unique(['comment_id', 'reactor_id', 'reactor_type']);
