@@ -22,12 +22,12 @@ class CommentService
      */
     public function store(Request $request): Comment
     {
-        if (! Config::get('comments.guest_commenting')) {
+        if (!Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
         $guestRules = [];
-        if (! $request->user()) {
+        if (!$request->user()) {
             $guestRules = [
                 'guest_name' => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
                 'guest_email' => Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']),
@@ -53,7 +53,7 @@ class CommentService
             /** @var Comment $comment */
             $comment = new $commentClass;
 
-            if (! $request->user()) {
+            if (!$request->user()) {
                 $comment->guest_name = $request->string('guest_name')->toString();
                 $comment->guest_email = $request->string('guest_email')->toString();
             } else {
@@ -62,11 +62,11 @@ class CommentService
 
             $comment->commentable()->associate($model);
             $comment->comment = $request->string('message')->toString();
-            $comment->approved = ! Config::get('comments.approval_required');
+            $comment->approved = !Config::get('comments.approval_required');
             $comment->save();
 
-            if (method_exists($model, 'afterCreateProcess')) {
-                $model->afterCreateProcess();
+            if (method_exists($model, 'afterCreate')) {
+                $model->afterCreate();
             }
 
             return $comment;
@@ -91,8 +91,8 @@ class CommentService
                 'comment' => $request->string('message')->toString(),
             ]);
 
-            if (method_exists($comment, 'afterUpdateProcess')) {
-                $comment->afterUpdateProcess();
+            if (method_exists($comment, 'afterUpdate')) {
+                $comment->afterUpdate();
             }
 
             return $comment;
@@ -109,8 +109,8 @@ class CommentService
         Gate::authorize('delete-comment', $comment);
 
         DB::transaction(function () use ($comment): void {
-            if (method_exists($comment, 'beforeDeleteProcess')) {
-                $comment->beforeDeleteProcess();
+            if (method_exists($comment, 'beforeDelete')) {
+                $comment->beforeDelete();
             }
 
             if (Config::get('comments.soft_deletes')) {
@@ -119,8 +119,8 @@ class CommentService
                 $comment->forceDelete();
             }
 
-            if (method_exists($comment, 'afterDeleteProcess')) {
-                $comment->afterDeleteProcess();
+            if (method_exists($comment, 'afterDelete')) {
+                $comment->afterDelete();
             }
         });
     }
@@ -148,11 +148,11 @@ class CommentService
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $request->string('message')->toString();
-            $reply->approved = ! Config::get('comments.approval_required');
+            $reply->approved = !Config::get('comments.approval_required');
             $reply->save();
 
-            if (method_exists($reply, 'afterReplyProcess')) {
-                $reply->afterReplyProcess();
+            if (method_exists($reply, 'afterReply')) {
+                $reply->afterReply();
             }
 
             return $reply;
@@ -219,7 +219,7 @@ class CommentService
         /** @var array<string, int> $counts */
         $counts = $comment->reactions
             ->groupBy('type')
-            ->map(fn ($group) => $group->count())
+            ->map(fn($group) => $group->count())
             ->toArray();
 
         // Ensure every configured type appears in the response (even with 0)

@@ -22,7 +22,7 @@ describe('testing comments on routes', function () {
     });
 
     it('can store a comment as authenticated user', function () {
-        Gate::define('create-comment', fn ($user) => true);
+        Gate::define('create-comment', fn($user) => true);
 
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
@@ -228,10 +228,9 @@ describe('testing comments on routes', function () {
         $response->assertStatus(403);
     });
 
-    it('runs afterCreateProcess on model if method exists', function () {
-        $post = new class extends PostModel
-        {
-            public function afterCreateProcess()
+    it('runs afterCreate on model if method exists', function () {
+        $post = new class extends PostModel {
+            public function afterCreate()
             {
                 $this->update(['name' => 'Updated after comment']);
             }

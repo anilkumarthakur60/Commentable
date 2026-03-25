@@ -21,7 +21,6 @@ A full-featured commenting system for Laravel. Attach comments to any Eloquent m
 - Support for multiple User models and non-integer IDs
 - N+1 query optimized
 
-
 ## Screenshots
 
 **Guest user** (guest commenting enabled — name and email fields shown):
@@ -36,12 +35,10 @@ A full-featured commenting system for Laravel. Attach comments to any Eloquent m
 
 ![Logged-out view](logout.png)
 
-
 ## Requirements
 
 - PHP 8.2+
 - Laravel 11, 12, or 13
-
 
 ## Installation
 
@@ -49,7 +46,6 @@ A full-featured commenting system for Laravel. Attach comments to any Eloquent m
 composer require anil/comments
 php artisan migrate
 ```
-
 
 ## Setup
 
@@ -83,7 +79,6 @@ class Post extends Model
 
 That's it. The package auto-detects the authenticated user and renders the full comment UI.
 
-
 ## Blade Component Options
 
 ```blade
@@ -115,7 +110,6 @@ By default replies nest up to level 3:
 
 Replies beyond the max depth are shown at the deepest level. Override per-component with `maxIndentationLevel` or globally via config (`max_depth`).
 
-
 ## Configuration
 
 Publish the config file:
@@ -126,29 +120,28 @@ php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=conf
 
 Key options in `config/comments.php`:
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `model` | `Comment::class` | Custom Comment model |
-| `reaction_model` | `CommentReaction::class` | Custom reaction model |
-| `controller` | `WebCommentController::class` | Custom controller |
-| `routes` | `true` | Register package routes |
-| `load_migrations` | `true` | Auto-load package migrations |
-| `approval_required` | `false` | Require admin approval before comments are visible |
-| `guest_commenting` | `true` | Allow unauthenticated users to comment |
-| `soft_deletes` | `false` | Use soft deletes instead of hard deletes |
-| `max_depth` | `3` | Maximum reply nesting level |
-| `sort` | `'latest'` | Default comment sort (`'latest'` or `'oldest'`) |
-| `reactions.enabled` | `true` | Enable the reactions system |
-| `reactions.types` | `['like', 'dislike']` | Allowed reaction types |
-| `rate_limiting.enabled` | `true` | Enable rate limiting on comment submission |
-| `rate_limiting.max_attempts` | `10` | Max submissions per window |
-| `rate_limiting.decay_minutes` | `1` | Rate limit window in minutes |
-| `middleware` | `['web']` | Middleware applied to comment routes |
-| `permissions` | Array | Gate → policy method mappings |
-| `validation.*` | Array | Override validation rules for each action |
-| `response_status` | Array | HTTP status codes for create/update/delete |
-| `response_messages` | Array | Response message strings |
-
+| Key                           | Default                       | Description                                        |
+| ----------------------------- | ----------------------------- | -------------------------------------------------- |
+| `model`                       | `Comment::class`              | Custom Comment model                               |
+| `reaction_model`              | `CommentReaction::class`      | Custom reaction model                              |
+| `controller`                  | `WebCommentController::class` | Custom controller                                  |
+| `routes`                      | `true`                        | Register package routes                            |
+| `load_migrations`             | `true`                        | Auto-load package migrations                       |
+| `approval_required`           | `false`                       | Require admin approval before comments are visible |
+| `guest_commenting`            | `true`                        | Allow unauthenticated users to comment             |
+| `soft_deletes`                | `false`                       | Use soft deletes instead of hard deletes           |
+| `max_depth`                   | `3`                           | Maximum reply nesting level                        |
+| `sort`                        | `'latest'`                    | Default comment sort (`'latest'` or `'oldest'`)    |
+| `reactions.enabled`           | `true`                        | Enable the reactions system                        |
+| `reactions.types`             | `['like', 'dislike']`         | Allowed reaction types                             |
+| `rate_limiting.enabled`       | `true`                        | Enable rate limiting on comment submission         |
+| `rate_limiting.max_attempts`  | `10`                          | Max submissions per window                         |
+| `rate_limiting.decay_minutes` | `1`                           | Rate limit window in minutes                       |
+| `middleware`                  | `['web']`                     | Middleware applied to comment routes               |
+| `permissions`                 | Array                         | Gate → policy method mappings                      |
+| `validation.*`                | Array                         | Override validation rules for each action          |
+| `response_status`             | Array                         | HTTP status codes for create/update/delete         |
+| `response_messages`           | Array                         | Response message strings                           |
 
 ## Publishing Assets
 
@@ -166,20 +159,18 @@ php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=tran
 php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=comments
 ```
 
-
 ## Authorization
 
 The package registers Laravel gates backed by `CommentPolicy`:
 
-| Gate | Default rule |
-|------|-------------|
-| `create-comment` | Any authenticated user |
-| `edit-comment` | Comment author only |
-| `delete-comment` | Comment author or user with `is_admin = true` |
+| Gate               | Default rule                                         |
+| ------------------ | ---------------------------------------------------- |
+| `create-comment`   | Any authenticated user                               |
+| `edit-comment`     | Comment author only                                  |
+| `delete-comment`   | Comment author or user with `is_admin = true`        |
 | `reply-to-comment` | Any authenticated user (cannot reply to own comment) |
 
 You can override the gate-to-policy mappings in `config/comments.php` under `permissions`, or publish and modify `CommentPolicy` directly.
-
 
 ## Reactions
 
@@ -196,7 +187,6 @@ Configure types in `config/comments.php`:
 
 Any string values are valid reaction types.
 
-
 ## Guest Commenting
 
 When `guest_commenting` is enabled, unauthenticated users can submit comments with a `guest_name` and `guest_email`. Honeypot spam protection (via `spatie/laravel-honeypot`) is automatically applied.
@@ -207,39 +197,37 @@ Disable guest commenting to show a login prompt instead:
 'guest_commenting' => false,
 ```
 
-
 ## Events
 
 The package dispatches the following events (all implement `SerializesModels` for queued listeners):
 
-| Event | Fired when |
-|-------|-----------|
+| Event                                 | Fired when           |
+| ------------------------------------- | -------------------- |
 | `Anil\Comments\Events\CommentCreated` | A comment is created |
-| `Anil\Comments\Events\CommentUpdated` | A comment is edited |
+| `Anil\Comments\Events\CommentUpdated` | A comment is edited  |
 | `Anil\Comments\Events\CommentDeleted` | A comment is deleted |
 
 Register listeners in your `EventServiceProvider` as normal.
-
 
 ## REST API
 
 All routes are prefixed with `/comments` and named with `comments.*`.
 
-| Method | URI | Name | Description |
-|--------|-----|------|-------------|
-| POST | `/comments` | `comments.store` | Create a comment |
-| PUT | `/comments/{comment}` | `comments.update` | Edit a comment |
-| DELETE | `/comments/{comment}` | `comments.destroy` | Delete a comment |
-| POST | `/comments/{comment}` | `comments.reply` | Reply to a comment |
-| POST | `/comments/{comment}/react` | `comments.react` | Toggle a reaction |
+| Method | URI                         | Name               | Description        |
+| ------ | --------------------------- | ------------------ | ------------------ |
+| POST   | `/comments`                 | `comments.store`   | Create a comment   |
+| PUT    | `/comments/{comment}`       | `comments.update`  | Edit a comment     |
+| DELETE | `/comments/{comment}`       | `comments.destroy` | Delete a comment   |
+| POST   | `/comments/{comment}`       | `comments.reply`   | Reply to a comment |
+| POST   | `/comments/{comment}/react` | `comments.react`   | Toggle a reaction  |
 
 ### POST `/comments`
 
 ```json
 {
-    "commentable_type": "App\\Models\\Post",
-    "commentable_id": "1",
-    "message": "Great post!"
+  "commentable_type": "App\\Models\\Post",
+  "commentable_id": "1",
+  "message": "Great post!"
 }
 ```
 
@@ -247,8 +235,8 @@ Guest fields (required when unauthenticated and guest commenting is enabled):
 
 ```json
 {
-    "guest_name": "Jane Doe",
-    "guest_email": "jane@example.com"
+  "guest_name": "Jane Doe",
+  "guest_email": "jane@example.com"
 }
 ```
 
@@ -256,7 +244,7 @@ Guest fields (required when unauthenticated and guest commenting is enabled):
 
 ```json
 {
-    "message": "Updated comment text."
+  "message": "Updated comment text."
 }
 ```
 
@@ -264,7 +252,7 @@ Guest fields (required when unauthenticated and guest commenting is enabled):
 
 ```json
 {
-    "message": "Reply text."
+  "message": "Reply text."
 }
 ```
 
@@ -272,7 +260,7 @@ Guest fields (required when unauthenticated and guest commenting is enabled):
 
 ```json
 {
-    "type": "like"
+  "type": "like"
 }
 ```
 
@@ -280,11 +268,10 @@ Returns:
 
 ```json
 {
-    "reaction_counts": { "like": 3, "dislike": 1 },
-    "user_reaction": "like"
+  "reaction_counts": { "like": 3, "dislike": 1 },
+  "user_reaction": "like"
 }
 ```
-
 
 ## Queryable Methods (Commentable trait)
 
@@ -304,21 +291,19 @@ $post->commentsWithRelations(['commenter']);
 Post::mostCommented(5);                           // static — top 5 most commented
 ```
 
-
 ## Lifecycle Hooks
 
 You can define these methods on your **Comment model** (after publishing and extending) or on your **commentable model** to run custom logic around comment operations:
 
-| Method | Trigger |
-|--------|---------|
-| `afterCreateProcess()` | After a comment is created |
-| `afterUpdateProcess()` | After a comment is updated |
-| `beforeDeleteProcess()` | Before a comment is deleted |
-| `afterDeleteProcess()` | After a comment is deleted |
-| `afterReplyProcess()` | After a reply is created |
+| Method           | Trigger                     |
+| ---------------- | --------------------------- |
+| `afterCreate()`  | After a comment is created  |
+| `afterUpdate()`  | After a comment is updated  |
+| `beforeDelete()` | Before a comment is deleted |
+| `afterDelete()`  | After a comment is deleted  |
+| `afterReply()`   | After a reply is created    |
 
 The service layer calls these hooks when they exist — no base implementation is required.
-
 
 ## Localization
 
@@ -332,7 +317,6 @@ Publish translations to customize or add new locales:
 php artisan vendor:publish --provider="Anil\Comments\ServiceProvider" --tag=translations
 ```
 
-
 ## Custom Controller
 
 To extend or replace the controller, set the `controller` key in config:
@@ -342,7 +326,6 @@ To extend or replace the controller, set the `controller` key in config:
 ```
 
 Your controller must implement `Anil\Comments\CommentControllerInterface` or extend `Anil\Comments\CommentController`.
-
 
 ## License
 
