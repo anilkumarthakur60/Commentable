@@ -33,7 +33,10 @@ class CommentReaction extends Model
      */
     public function getTable(): string
     {
-        return Config::get('comments.table_names.reactions', parent::getTable());
+        /** @var string $table */
+        $table = Config::get('comments.table_names.reactions', parent::getTable());
+
+        return $table;
     }
 
     /**

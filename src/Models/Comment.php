@@ -67,7 +67,10 @@ class Comment extends Model
      */
     public function getTable(): string
     {
-        return Config::get('comments.table_names.comments', parent::getTable());
+        /** @var string $table */
+        $table = Config::get('comments.table_names.comments', parent::getTable());
+
+        return $table;
     }
 
     /**
@@ -169,7 +172,11 @@ class Comment extends Model
             return '';
         }
 
-        $size ??= (int) Config::get('comments.avatar.size', 64);
+        /** @var int $configSize */
+        $configSize = Config::get('comments.avatar.size', 64);
+        $size ??= $configSize;
+
+        /** @var string $default */
         $default = Config::get('comments.avatar.default', 'mp');
 
         $email = '';

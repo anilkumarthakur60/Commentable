@@ -4,9 +4,9 @@ namespace Anil\Comments\Concerns;
 
 use Anil\Comments\Models\Comment;
 use Closure;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
@@ -99,11 +99,13 @@ trait Commentable
      *
      * Uses the per_page value from config when no override is given.
      *
-     * @return LengthAwarePaginator<Comment>
+     * @return LengthAwarePaginator<int, Comment>
      */
     public function paginatedComments(?int $perPage = null): LengthAwarePaginator
     {
-        $perPage ??= (int) Config::get('comments.per_page', 10);
+        /** @var int $configPerPage */
+        $configPerPage = Config::get('comments.per_page', 10);
+        $perPage ??= $configPerPage;
 
         $sort = Config::get('comments.sort', 'latest');
         $orderDirection = $sort === 'oldest' ? 'asc' : 'desc';
