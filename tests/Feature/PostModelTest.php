@@ -2,10 +2,10 @@
 
 namespace Anil\Comments\Tests\Feature\Models;
 
-use Anil\Comments\Tests\TestSetup\Models\PostModel;
-use Anil\Comments\Tests\TestSetup\Models\UserModel;
+use Anil\Comments\Tests\Support\Models\PostModel;
+use Anil\Comments\Tests\Support\Models\UserModel;
 
-describe('Testing Commentable on PostModel', function () {
+describe('Testing Commentable trait on PostModel', function () {
     beforeEach(function () {
         $this->user = UserModel::factory()->create();
         $this->post = PostModel::factory()->create([

@@ -1,10 +1,10 @@
 <?php
 
-use Anil\Comments\Comment;
-use Anil\Comments\Tests\TestSetup\Models\PostModel;
-use Anil\Comments\Tests\TestSetup\Models\UserModel;
+use Anil\Comments\Models\Comment;
+use Anil\Comments\Tests\Support\Models\PostModel;
+use Anil\Comments\Tests\Support\Models\UserModel;
 
-describe('Testing Commentable on UserModel', function () {
+describe('Testing Commentable trait on UserModel', function () {
     beforeEach(function () {
         $this->user = UserModel::factory()->create();
         $this->otherUser = UserModel::factory()->create();
@@ -17,7 +17,6 @@ describe('Testing Commentable on UserModel', function () {
         $comment = $this->post->comments()->create([
             'comment' => 'Test comment',
         ]);
-        // associate user to comment
         $comment->commenter()->associate($this->user);
         $comment->save();
 
@@ -30,14 +29,12 @@ describe('Testing Commentable on UserModel', function () {
         $parentComment = $this->post->comments()->create([
             'comment' => 'Parent comment',
         ]);
-        // associate user to comment
         $parentComment->commenter()->associate($this->user);
         $parentComment->save();
 
         $reply = $this->post->comments()->create([
             'comment' => 'Reply to parent',
         ]);
-        // associate user to comment
         $reply->commenter()->associate($this->otherUser);
         $reply->save();
         $reply->parent()->associate($parentComment);
@@ -48,7 +45,6 @@ describe('Testing Commentable on UserModel', function () {
     });
 
     it('can get latest comments', function () {
-        // Create comments with different timestamps
         $oldComment = $this->post->comments()->create([
             'comment' => 'Old comment',
         ]);
@@ -73,7 +69,6 @@ describe('Testing Commentable on UserModel', function () {
         $post2 = PostModel::factory()->create(['name' => 'Test Post 2']);
         $post3 = PostModel::factory()->create(['name' => 'Test Post 3']);
 
-        // Add comments to posts
         $this->post->comments()->createMany([
             [
                 'comment' => 'Comment 1',
@@ -195,7 +190,7 @@ describe('Testing Commentable on UserModel', function () {
     });
 
     it('can get comments with relations', function () {
-        $comment = $this->post->comments()->create([
+        $this->post->comments()->create([
             'comment' => 'Test comment',
             'commenter_id' => $this->user->id,
             'commenter_type' => UserModel::class,

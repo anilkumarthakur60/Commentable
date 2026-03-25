@@ -2,6 +2,8 @@
 
 namespace Anil\Comments;
 
+use Anil\Comments\Models\Comment;
+use Anil\Comments\Models\CommentReaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
@@ -22,12 +24,12 @@ class CommentService
      */
     public function store(Request $request): Comment
     {
-        if (!Config::get('comments.guest_commenting')) {
+        if (! Config::get('comments.guest_commenting')) {
             Gate::authorize('create-comment', Comment::class);
         }
 
         $guestRules = [];
-        if (!$request->user()) {
+        if (! $request->user()) {
             $guestRules = [
                 'guest_name' => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
                 'guest_email' => Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']),
@@ -53,7 +55,7 @@ class CommentService
             /** @var Comment $comment */
             $comment = new $commentClass;
 
-            if (!$request->user()) {
+            if (! $request->user()) {
                 $comment->guest_name = $request->string('guest_name')->toString();
                 $comment->guest_email = $request->string('guest_email')->toString();
             } else {
@@ -62,7 +64,7 @@ class CommentService
 
             $comment->commentable()->associate($model);
             $comment->comment = $request->string('message')->toString();
-            $comment->approved = !Config::get('comments.approval_required');
+            $comment->approved = ! Config::get('comments.approval_required');
             $comment->save();
 
             if (method_exists($model, 'afterCreate')) {
@@ -148,7 +150,7 @@ class CommentService
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $request->string('message')->toString();
-            $reply->approved = !Config::get('comments.approval_required');
+            $reply->approved = ! Config::get('comments.approval_required');
             $reply->save();
 
             if (method_exists($reply, 'afterReply')) {
@@ -201,7 +203,7 @@ class CommentService
             if ($existing->type === $type) {
                 $existing->delete();          // toggle off
             } else {
-                $existing->update(['type' => $type]);  // switch
+                $existing->update(['type' => $type]);  // switch reaction type
                 $userReaction = $type;
             }
         } else {
@@ -219,10 +221,10 @@ class CommentService
         /** @var array<string, int> $counts */
         $counts = $comment->reactions
             ->groupBy('type')
-            ->map(fn($group) => $group->count())
+            ->map(fn ($group) => $group->count())
             ->toArray();
 
-        // Ensure every configured type appears in the response (even with 0)
+        // Ensure every configured type appears in the response (even with 0).
         foreach ($allowedTypes as $allowedType) {
             $counts[$allowedType] ??= 0;
         }

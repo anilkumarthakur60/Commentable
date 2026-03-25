@@ -3,7 +3,7 @@
 namespace Anil\Comments\Tests;
 
 use Anil\Comments\ServiceProvider;
-use Anil\Comments\Tests\TestSetup\Models\UserModel;
+use Anil\Comments\Tests\Support\Models\UserModel;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,7 +13,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    // use DatabaseMigrations;
     use RefreshDatabase;
 
     /**
@@ -24,12 +23,12 @@ abstract class TestCase extends OrchestraTestCase
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            function (string $modelName): string {
-                return 'Anil\\Comments\Tests\\TestSetup\\Factories\\'.class_basename($modelName).'Factory';
-            }
+            fn (string $modelName): string => 'Anil\\Comments\\Tests\\Support\\Factories\\'.class_basename($modelName).'Factory'
         );
+
         /** @var Application $app */
         $app = $this->app;
+
         $app['config']->set('auth.guards.web', [
             'driver' => 'session',
             'provider' => 'users',
@@ -41,21 +40,24 @@ abstract class TestCase extends OrchestraTestCase
         ]);
 
         $app['config']->set('auth.defaults.guard', 'web');
+
         $this->setUpDatabase();
     }
 
     protected function setUpDatabase(): void
     {
         $schema = $this->app['db']->connection()->getSchemaBuilder();
+
         if (! $schema->hasTable('users')) {
-            $this->userMigration();
+            $this->createUsersTable();
         }
+
         if (! $schema->hasTable('posts')) {
-            $this->postMigration();
+            $this->createPostsTable();
         }
     }
 
-    protected function userMigration(): void
+    protected function createUsersTable(): void
     {
         /** @var Application $app */
         $app = $this->app;
@@ -63,14 +65,14 @@ abstract class TestCase extends OrchestraTestCase
             ->getSchemaBuilder()
             ->create('users', function (Blueprint $table) {
                 $table->id();
-                $table->string(column: 'name');
-                $table->string(column: 'email');
-                $table->string(column: 'password');
+                $table->string('name');
+                $table->string('email');
+                $table->string('password');
                 $table->timestamps();
             });
     }
 
-    protected function postMigration(): void
+    protected function createPostsTable(): void
     {
         /** @var Application $app */
         $app = $this->app;
@@ -78,11 +80,15 @@ abstract class TestCase extends OrchestraTestCase
             ->getSchemaBuilder()
             ->create('posts', function (Blueprint $table) {
                 $table->id();
-                $table->string(column: 'name');
+                $table->string('name');
                 $table->timestamps();
             });
     }
 
+    /**
+     * @param  Application  $app
+     * @return list<class-string>
+     */
     protected function getPackageProviders($app): array
     {
         return [
