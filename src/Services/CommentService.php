@@ -12,6 +12,7 @@ use Anil\Comments\Models\Comment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 class CommentService implements CommentServiceContract
@@ -88,6 +89,8 @@ class CommentService implements CommentServiceContract
      */
     public function destroy(Comment $comment): void
     {
+        Gate::authorize('delete-comment', $comment);
+
         DB::transaction(function () use ($comment): void {
             if (method_exists($comment, 'beforeDelete')) {
                 $comment->beforeDelete();

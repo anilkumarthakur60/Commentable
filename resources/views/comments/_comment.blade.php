@@ -1,7 +1,15 @@
 @php
     /** @var Comment $comment */
-    use Anil\Comments\Comment;$markdownParser = new Parsedown();
-    $markdownParser->setSafeMode(true);
+    use Anil\Comments\Models\Comment;
+    use Illuminate\Support\Facades\Config;
+
+    // Markdown parser — shared via static variable so it's only created once
+    static $markdownParser = null;
+    $markdownEnabled = Config::get('comments.markdown.enabled', true);
+    if ($markdownEnabled && $markdownParser === null) {
+        $markdownParser = new Parsedown();
+        $markdownParser->setSafeMode(true);
+    }
 
     $currentLevel = $indentationLevel ?? 0;
     $maxLevel     = $maxIndentationLevel ?? 3;
@@ -56,9 +64,10 @@
         {{-- Avatar --}}
         <div class="cc-avatar-wrap">
             <img
-                src="{{ $comment->getAvatarUrl(40) }}"
+                src="{{ $comment->getAvatarUrl() }}"
                 alt="{{ $authorName }}"
                 class="cc-avatar"
+                loading="lazy"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
             >
             <div class="cc-avatar-init" style="display:none;background:{{ $avatarBg }};">{{ $initials }}</div>
@@ -69,8 +78,8 @@
             <div class="cc-meta">
                 <span class="cc-author">
                     {{ $authorName }}
-                    @if($comment->approved)
-                        <span class="cc-verified" title="Verified">
+                    @if($comment->approved && !$comment->isGuestComment())
+                        <span class="cc-verified" title="@lang('comments::comments.verified')">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="#3b82f6"><path
                                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                         </span>
@@ -82,7 +91,11 @@
                 @endif
             </div>
 
-            <p class="cc-text">{!! $markdownParser->line($comment->comment) !!}</p>
+            @if($markdownEnabled)
+                <div class="cc-text">{!! $markdownParser->line($comment->comment) !!}</div>
+            @else
+                <p class="cc-text">{{ $comment->comment }}</p>
+            @endif
 
             {{-- Actions --}}
             <div class="cc-actions">
@@ -95,6 +108,7 @@
                             data-comment="{{ $commentKey }}"
                             data-type="{{ $reactionType }}"
                             title="{{ ucfirst($reactionType) }}"
+                            aria-label="{{ ucfirst($reactionType) }} ({{ $reactionCounts[$reactionType] ?? 0 }})"
                         >
                             {!! $reactionIcons[$reactionType] ?? '<span style="font-size:11px;font-weight:600;">'.e(ucfirst($reactionType)).'</span>' !!}
                             <span class="cc-reaction-count">{{ $reactionCounts[$reactionType] ?? 0 }}</span>
@@ -108,26 +122,29 @@
                         type="button"
                         class="cc-action-btn"
                         data-cc-toggle="cc-reply-{{ $commentKey }}"
-                        title="Reply"
+                        title="@lang('comments::comments.reply')"
                     >
                         <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
                             <path
                                 d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
                         </svg>
-                        Reply
+                        @lang('comments::comments.reply')
                     </button>
                 @endcan
 
                 {{-- More (edit / delete) --}}
                 @canany(['edit-comment', 'delete-comment'], $comment)
                     <div class="cc-dropdown">
-                        <button type="button" class="cc-more-btn" title="More options">•••</button>
-                        <div class="cc-dropdown-menu">
+                        <button type="button" class="cc-more-btn" title="@lang('comments::comments.more_options')"
+                                aria-haspopup="true">&#x2022;&#x2022;&#x2022;
+                        </button>
+                        <div class="cc-dropdown-menu" role="menu">
                             @can('edit-comment', $comment)
                                 <button
                                     type="button"
                                     class="cc-dropdown-item"
                                     data-cc-toggle="cc-edit-{{ $commentKey }}"
+                                    role="menuitem"
                                 >@lang('comments::comments.edit')</button>
                             @endcan
                             @can('delete-comment', $comment)
@@ -140,7 +157,8 @@
                                     @method('DELETE')
                                     @csrf
                                     <button type="submit"
-                                            class="cc-dropdown-item cc-danger">@lang('comments::comments.delete')</button>
+                                            class="cc-dropdown-item cc-danger"
+                                            role="menuitem">@lang('comments::comments.delete')</button>
                                 </form>
                             @endcan
                         </div>
@@ -157,12 +175,13 @@
                             class="cc-inline-textarea"
                             name="message"
                             rows="3"
-                            placeholder="Write your reply to {{ $authorName }}…"
+                            placeholder="@lang('comments::comments.write_reply_to', ['name' => $authorName])"
                             required
                         ></textarea>
                         <div class="cc-inline-footer">
-                            <button type="button" class="cc-cancel-btn" data-cc-close>Cancel</button>
-                            <button type="submit" class="cc-submit-btn">Post Reply</button>
+                            <button type="button" class="cc-cancel-btn"
+                                    data-cc-close>@lang('comments::comments.cancel')</button>
+                            <button type="submit" class="cc-submit-btn">@lang('comments::comments.post_reply')</button>
                         </div>
                     </form>
                 </div>
@@ -181,8 +200,9 @@
                             required
                         >{{ $comment->comment }}</textarea>
                         <div class="cc-inline-footer">
-                            <button type="button" class="cc-cancel-btn" data-cc-close>Cancel</button>
-                            <button type="submit" class="cc-submit-btn">Update</button>
+                            <button type="button" class="cc-cancel-btn"
+                                    data-cc-close>@lang('comments::comments.cancel')</button>
+                            <button type="submit" class="cc-submit-btn">@lang('comments::comments.update')</button>
                         </div>
                     </form>
                 </div>

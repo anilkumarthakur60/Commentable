@@ -2,8 +2,10 @@
 
 namespace Anil\Comments\Http\Requests;
 
+use Anil\Comments\Models\Comment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 
 class StoreCommentRequest extends FormRequest
 {
@@ -16,7 +18,11 @@ class StoreCommentRequest extends FormRequest
             return true;
         }
 
-        return $this->user() !== null;
+        if ($this->user() === null) {
+            return false;
+        }
+
+        return Gate::allows('create-comment', Comment::class);
     }
 
     /**

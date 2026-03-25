@@ -1,0 +1,14 @@
+# Auto-detect text files and normalise line endings
+* text=auto eol=lf
+
+# Exclude dev/CI files from the production package (composer install --prefer-dist)
+/.editorconfig          export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/.github/               export-ignore
+/.phpunit.cache/        export-ignore
+/phpstan.neon.dist      export-ignore
+/phpunit.xml            export-ignore
+/tests/                 export-ignore
+/CHANGELOG.md           export-ignore
+/*.png                  export-ignore
