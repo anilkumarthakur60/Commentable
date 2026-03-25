@@ -2,7 +2,11 @@
 
 namespace Anil\Comments;
 
+use Anil\Comments\Contracts\CommentServiceContract;
+use Anil\Comments\Contracts\ReactionServiceContract;
 use Anil\Comments\Models\Comment;
+use Anil\Comments\Services\CommentService;
+use Anil\Comments\Services\ReactionService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
@@ -21,6 +25,9 @@ class ServiceProvider extends LaravelServiceProvider
             __DIR__.'/../config/comments.php',
             'comments'
         );
+
+        $this->app->bind(CommentServiceContract::class, CommentService::class);
+        $this->app->bind(ReactionServiceContract::class, ReactionService::class);
     }
 
     /**

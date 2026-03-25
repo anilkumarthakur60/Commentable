@@ -9,7 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Throwable;
 
-interface CommentControllerContract
+interface CommentCrudContract
 {
     /**
      * Creates a new comment for a given model.
@@ -38,9 +38,4 @@ interface CommentControllerContract
      * @throws Throwable
      */
     public function reply(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse;
-
-    /**
-     * Toggles a reaction (like/dislike or any configured type) on a comment.
-     */
-    public function react(Request $request, Comment $comment): JsonResponse|RedirectResponse;
 }

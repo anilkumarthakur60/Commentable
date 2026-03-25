@@ -2,7 +2,8 @@
 
 namespace Anil\Comments\Http\Controllers;
 
-use Anil\Comments\CommentService;
+use Anil\Comments\Contracts\CommentServiceContract;
+use Anil\Comments\Contracts\ReactionServiceContract;
 use Anil\Comments\Http\Resources\CommentResource;
 use Anil\Comments\Models\Comment;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,8 @@ use Throwable;
 class WebCommentController extends CommentController
 {
     public function __construct(
-        public readonly CommentService $commentService
+        public readonly CommentServiceContract $commentService,
+        public readonly ReactionServiceContract $reactionService,
     ) {
         parent::__construct();
     }
@@ -106,7 +108,7 @@ class WebCommentController extends CommentController
             return Redirect::route('login');
         }
 
-        $result = $this->commentService->react($request, $comment);
+        $result = $this->reactionService->react($request, $comment);
 
         if ($request->wantsJson()) {
             return response()->json($result);

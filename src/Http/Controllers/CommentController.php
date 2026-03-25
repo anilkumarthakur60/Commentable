@@ -2,12 +2,13 @@
 
 namespace Anil\Comments\Http\Controllers;
 
-use Anil\Comments\Contracts\CommentControllerContract;
+use Anil\Comments\Contracts\CommentCrudContract;
+use Anil\Comments\Contracts\CommentReactionContract;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Config;
 use Spatie\Honeypot\ProtectAgainstSpam;
 
-abstract class CommentController extends Controller implements CommentControllerContract
+abstract class CommentController extends Controller implements CommentCrudContract, CommentReactionContract
 {
     public function __construct()
     {
@@ -16,12 +17,10 @@ abstract class CommentController extends Controller implements CommentController
 
         $this->middleware($middleware);
 
-        // When guest commenting is allowed, protect the store action against spam bots.
         if (Config::get('comments.guest_commenting')) {
             $this->middleware(ProtectAgainstSpam::class)->only('store');
         }
 
-        // Apply rate-limiting when configured.
         if (Config::get('comments.rate_limiting.enabled')) {
             /** @var int $maxAttempts */
             $maxAttempts = Config::get('comments.rate_limiting.max_attempts', 10);
@@ -30,7 +29,6 @@ abstract class CommentController extends Controller implements CommentController
 
             $throttledActions = ['store', 'reply', 'update'];
 
-            // Only throttle react when reactions are enabled.
             if (Config::get('comments.reactions.enabled', true)) {
                 $throttledActions[] = 'react';
             }
