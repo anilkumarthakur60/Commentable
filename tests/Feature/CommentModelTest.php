@@ -14,7 +14,7 @@ describe('Comment Model', function () {
 
     describe('relationships', function () {
         it('belongs to a commenter (morphTo)', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -27,7 +27,7 @@ describe('Comment Model', function () {
         });
 
         it('belongs to a commentable (morphTo)', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -40,13 +40,13 @@ describe('Comment Model', function () {
         });
 
         it('has many children (replies)', function () {
-            $parent = new Comment;
+            $parent = new Comment();
             $parent->comment = 'Parent';
             $parent->commenter()->associate($this->user);
             $parent->commentable()->associate($this->post);
             $parent->save();
 
-            $child = new Comment;
+            $child = new Comment();
             $child->comment = 'Child';
             $child->commenter()->associate($this->user);
             $child->commentable()->associate($this->post);
@@ -60,13 +60,13 @@ describe('Comment Model', function () {
         });
 
         it('belongs to a parent comment', function () {
-            $parent = new Comment;
+            $parent = new Comment();
             $parent->comment = 'Parent';
             $parent->commenter()->associate($this->user);
             $parent->commentable()->associate($this->post);
             $parent->save();
 
-            $child = new Comment;
+            $child = new Comment();
             $child->comment = 'Child';
             $child->commenter()->associate($this->user);
             $child->commentable()->associate($this->post);
@@ -80,17 +80,17 @@ describe('Comment Model', function () {
         });
 
         it('has many reactions', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
             $comment->save();
 
             CommentReaction::create([
-                'comment_id' => $comment->id,
-                'reactor_id' => $this->user->id,
+                'comment_id'   => $comment->id,
+                'reactor_id'   => $this->user->id,
                 'reactor_type' => UserModel::class,
-                'type' => 'like',
+                'type'         => 'like',
             ]);
 
             $comment->refresh();
@@ -102,7 +102,7 @@ describe('Comment Model', function () {
 
     describe('getAvatarUrl', function () {
         it('returns gravatar URL for authenticated user', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -117,7 +117,7 @@ describe('Comment Model', function () {
         });
 
         it('returns gravatar URL for guest with email', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->guest_name = 'Guest';
             $comment->guest_email = 'guest@example.com';
@@ -133,7 +133,7 @@ describe('Comment Model', function () {
         it('respects avatar size from config', function () {
             Config::set('comments.avatar.size', 128);
 
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -145,7 +145,7 @@ describe('Comment Model', function () {
         it('respects avatar default from config', function () {
             Config::set('comments.avatar.default', 'identicon');
 
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -157,7 +157,7 @@ describe('Comment Model', function () {
         it('returns empty string when avatar provider is null', function () {
             Config::set('comments.avatar.provider', null);
 
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -167,7 +167,7 @@ describe('Comment Model', function () {
         });
 
         it('allows size override via parameter', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -179,7 +179,7 @@ describe('Comment Model', function () {
 
     describe('getAuthorName', function () {
         it('returns commenter name for authenticated comments', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -189,7 +189,7 @@ describe('Comment Model', function () {
         });
 
         it('returns guest_name for guest comments', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->guest_name = 'Jane Guest';
             $comment->commentable()->associate($this->post);
@@ -199,7 +199,7 @@ describe('Comment Model', function () {
         });
 
         it('returns Anonymous when no name is available', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commentable()->associate($this->post);
             $comment->save();
@@ -210,7 +210,7 @@ describe('Comment Model', function () {
 
     describe('isGuestComment', function () {
         it('returns true for guest comments', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->guest_name = 'Guest';
             $comment->commentable()->associate($this->post);
@@ -220,7 +220,7 @@ describe('Comment Model', function () {
         });
 
         it('returns false for authenticated comments', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -232,7 +232,7 @@ describe('Comment Model', function () {
 
     describe('table name', function () {
         it('uses configurable table name', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             expect($comment->getTable())->toBe('comments');
 
             Config::set('comments.table_names.comments', 'custom_comments');
@@ -242,7 +242,7 @@ describe('Comment Model', function () {
 
     describe('casts', function () {
         it('casts approved to boolean', function () {
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'Test';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);

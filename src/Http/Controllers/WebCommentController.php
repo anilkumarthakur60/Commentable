@@ -98,7 +98,7 @@ class WebCommentController extends CommentController
      */
     public function react(ReactRequest $request, Comment $comment): JsonResponse|RedirectResponse
     {
-        if (! Config::get('comments.reactions.enabled', true)) {
+        if (!Config::get('comments.reactions.enabled', true)) {
             abort(404);
         }
 

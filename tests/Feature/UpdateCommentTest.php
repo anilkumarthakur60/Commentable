@@ -13,7 +13,7 @@ describe('Update comment', function () {
         $this->otherUser = UserModel::factory()->create();
         $this->post = PostModel::factory()->create();
 
-        $this->comment = new Comment;
+        $this->comment = new Comment();
         $this->comment->comment = 'Original comment';
         $this->comment->commenter()->associate($this->user);
         $this->comment->commentable()->associate($this->post);
@@ -31,7 +31,7 @@ describe('Update comment', function () {
             ->assertJson(['data' => ['comment' => 'Updated comment']]);
 
         $this->assertDatabaseHas('comments', [
-            'id' => $this->comment->id,
+            'id'      => $this->comment->id,
             'comment' => 'Updated comment',
         ]);
     });
@@ -45,7 +45,7 @@ describe('Update comment', function () {
         $response->assertStatus(403);
 
         $this->assertDatabaseHas('comments', [
-            'id' => $this->comment->id,
+            'id'      => $this->comment->id,
             'comment' => 'Original comment',
         ]);
     });

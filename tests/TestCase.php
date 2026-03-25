@@ -30,13 +30,13 @@ abstract class TestCase extends OrchestraTestCase
         $app = $this->app;
 
         $app['config']->set('auth.guards.web', [
-            'driver' => 'session',
+            'driver'   => 'session',
             'provider' => 'users',
         ]);
 
         $app['config']->set('auth.providers.users', [
             'driver' => 'eloquent',
-            'model' => UserModel::class,
+            'model'  => UserModel::class,
         ]);
 
         $app['config']->set('auth.defaults.guard', 'web');
@@ -48,11 +48,11 @@ abstract class TestCase extends OrchestraTestCase
     {
         $schema = $this->app['db']->connection()->getSchemaBuilder();
 
-        if (! $schema->hasTable('users')) {
+        if (!$schema->hasTable('users')) {
             $this->createUsersTable();
         }
 
-        if (! $schema->hasTable('posts')) {
+        if (!$schema->hasTable('posts')) {
             $this->createPostsTable();
         }
     }
@@ -87,7 +87,8 @@ abstract class TestCase extends OrchestraTestCase
     }
 
     /**
-     * @param  Application  $app
+     * @param Application $app
+     *
      * @return list<class-string>
      */
     protected function getPackageProviders($app): array

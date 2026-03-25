@@ -14,19 +14,19 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 
 /**
- * @property int|string $id
- * @property string $comment
- * @property bool $approved
- * @property string|null $guest_name
- * @property string|null $guest_email
- * @property string $commentable_type
- * @property int|string $commentable_id
+ * @property int|string      $id
+ * @property string          $comment
+ * @property bool            $approved
+ * @property string|null     $guest_name
+ * @property string|null     $guest_email
+ * @property string          $commentable_type
+ * @property int|string      $commentable_id
  * @property int|string|null $child_id
  * @property int|string|null $commenter_id
- * @property string|null $commenter_type
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon|null $deleted_at
+ * @property string|null     $commenter_type
+ * @property Carbon          $created_at
+ * @property Carbon          $updated_at
+ * @property Carbon|null     $deleted_at
  * @property-read Model|null $commenter
  * @property-read Model|null $commentable
  */
@@ -88,13 +88,14 @@ class Comment extends Model
      *
      * Skips event dispatching when events are disabled in config.
      *
-     * @param  string  $event
-     * @param  bool  $halt
+     * @param string $event
+     * @param bool   $halt
+     *
      * @return mixed
      */
     protected function fireModelEvent($event, $halt = true)
     {
-        if (! Config::get('comments.events.enabled', true)) {
+        if (!Config::get('comments.events.enabled', true)) {
             return true;
         }
 

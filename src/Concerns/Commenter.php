@@ -45,7 +45,8 @@ trait Commenter
      *   User::approvedComments()->get()         // users with approved comments
      *   User::approvedComments(false)->get()    // users with pending comments
      *
-     * @param  Builder<static>  $builder
+     * @param Builder<static> $builder
+     *
      * @return Builder<static>
      */
     public function scopeApprovedComments(Builder $builder, bool $approved = true): Builder

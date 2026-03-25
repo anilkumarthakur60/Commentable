@@ -13,7 +13,7 @@ describe('Reactions', function () {
         $this->user = UserModel::factory()->create();
         $this->post = PostModel::factory()->create();
 
-        $this->comment = new Comment;
+        $this->comment = new Comment();
         $this->comment->comment = 'Test comment';
         $this->comment->commenter()->associate($this->user);
         $this->comment->commentable()->associate($this->post);
@@ -29,14 +29,14 @@ describe('Reactions', function () {
 
         $response->assertOk()
             ->assertJson([
-                'reactions' => ['like' => 1, 'dislike' => 0],
+                'reactions'     => ['like' => 1, 'dislike' => 0],
                 'user_reaction' => 'like',
             ]);
 
         $this->assertDatabaseHas('comment_reactions', [
             'comment_id' => $this->comment->id,
             'reactor_id' => $this->user->id,
-            'type' => 'like',
+            'type'       => 'like',
         ]);
     });
 
@@ -51,7 +51,7 @@ describe('Reactions', function () {
 
         $response->assertOk()
             ->assertJson([
-                'reactions' => ['like' => 0, 'dislike' => 0],
+                'reactions'     => ['like' => 0, 'dislike' => 0],
                 'user_reaction' => null,
             ]);
 
@@ -72,7 +72,7 @@ describe('Reactions', function () {
 
         $response->assertOk()
             ->assertJson([
-                'reactions' => ['like' => 0, 'dislike' => 1],
+                'reactions'     => ['like' => 0, 'dislike' => 1],
                 'user_reaction' => 'dislike',
             ]);
 
@@ -133,7 +133,7 @@ describe('Reactions', function () {
 
         $response->assertOk()
             ->assertJson([
-                'reactions' => ['like' => 2, 'dislike' => 0],
+                'reactions'     => ['like' => 2, 'dislike' => 0],
                 'user_reaction' => 'like',
             ]);
     });

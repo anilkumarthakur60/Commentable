@@ -13,7 +13,7 @@ describe('Reply to comment', function () {
         $this->otherUser = UserModel::factory()->create();
         $this->post = PostModel::factory()->create();
 
-        $this->comment = new Comment;
+        $this->comment = new Comment();
         $this->comment->comment = 'Parent comment';
         $this->comment->commenter()->associate($this->user);
         $this->comment->commentable()->associate($this->post);
@@ -30,16 +30,16 @@ describe('Reply to comment', function () {
         $response->assertStatus(201)
             ->assertJson([
                 'data' => [
-                    'comment' => 'Reply text',
-                    'child_id' => $this->comment->id,
+                    'comment'      => 'Reply text',
+                    'child_id'     => $this->comment->id,
                     'commenter_id' => $this->otherUser->id,
                 ],
             ]);
 
         $this->assertDatabaseHas('comments', [
-            'comment' => 'Reply text',
-            'child_id' => $this->comment->id,
-            'commentable_id' => $this->post->id,
+            'comment'          => 'Reply text',
+            'child_id'         => $this->comment->id,
+            'commentable_id'   => $this->post->id,
             'commentable_type' => PostModel::class,
         ]);
     });

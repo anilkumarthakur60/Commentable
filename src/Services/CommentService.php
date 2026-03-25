@@ -25,8 +25,8 @@ class CommentService implements CommentServiceContract
      */
     public function store(StoreCommentRequest $request): Comment
     {
-        if (! $request->user() && ! Config::get('comments.guest_commenting')) {
-            throw new GuestCommentingDisabledException;
+        if (!$request->user() && !Config::get('comments.guest_commenting')) {
+            throw new GuestCommentingDisabledException();
         }
 
         /** @var class-string<Model> $commentableClass */
@@ -40,9 +40,9 @@ class CommentService implements CommentServiceContract
 
         return DB::transaction(function () use ($request, $model, $commentClass): Comment {
             /** @var Comment $comment */
-            $comment = new $commentClass;
+            $comment = new $commentClass();
 
-            if (! $request->user()) {
+            if (!$request->user()) {
                 $comment->guest_name = $request->string('guest_name')->toString();
                 $comment->guest_email = $request->string('guest_email')->toString();
             } else {
@@ -51,7 +51,7 @@ class CommentService implements CommentServiceContract
 
             $comment->commentable()->associate($model);
             $comment->comment = $request->string('message')->toString();
-            $comment->approved = ! Config::get('comments.approval_required');
+            $comment->approved = !Config::get('comments.approval_required');
             $comment->save();
 
             if (method_exists($model, 'afterCreate')) {
@@ -123,12 +123,12 @@ class CommentService implements CommentServiceContract
 
         return DB::transaction(function () use ($request, $comment, $commentClass): Comment {
             /** @var Comment $reply */
-            $reply = new $commentClass;
+            $reply = new $commentClass();
             $reply->commenter()->associate($request->user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $request->string('message')->toString();
-            $reply->approved = ! Config::get('comments.approval_required');
+            $reply->approved = !Config::get('comments.approval_required');
             $reply->save();
 
             if (method_exists($reply, 'afterReply')) {

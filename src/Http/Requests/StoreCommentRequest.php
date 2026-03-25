@@ -34,11 +34,11 @@ class StoreCommentRequest extends FormRequest
     {
         $rules = [
             'commentable_type' => ['required', 'string'],
-            'commentable_id' => ['required', 'min:1'],
-            'message' => Config::get('comments.validation.message', ['required', 'string']),
+            'commentable_id'   => ['required', 'min:1'],
+            'message'          => Config::get('comments.validation.message', ['required', 'string']),
         ];
 
-        if (! $this->user()) {
+        if (!$this->user()) {
             $rules['guest_name'] = Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']);
             $rules['guest_email'] = Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']);
         }

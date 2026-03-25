@@ -152,7 +152,8 @@ trait Commentable
     /**
      * Get comments matching specific column/value pairs.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param array<string, mixed> $attributes
+     *
      * @return MorphMany<Comment, $this>
      */
     public function commentsWithAttributes(array $attributes): MorphMany
@@ -163,7 +164,8 @@ trait Commentable
     /**
      * Get comments with the given relationships eager-loaded.
      *
-     * @param  array<int, string>|array<string, Closure>  $relations
+     * @param array<int, string>|array<string, Closure> $relations
+     *
      * @return MorphMany<Comment, $this>
      */
     public function commentsWithRelations(array $relations): MorphMany

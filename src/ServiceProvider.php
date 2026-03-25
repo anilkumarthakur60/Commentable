@@ -111,7 +111,7 @@ class ServiceProvider extends LaravelServiceProvider
      */
     protected function registerPublishables(): void
     {
-        if (! $this->app->runningInConsole()) {
+        if (!$this->app->runningInConsole()) {
             return;
         }
 
@@ -134,9 +134,9 @@ class ServiceProvider extends LaravelServiceProvider
         // Publish everything at once with the 'comments' tag.
         $this->publishes([
             __DIR__.'/../database/migrations' => App::databasePath('migrations'),
-            __DIR__.'/../resources/views' => App::resourcePath('views/vendor/comments'),
+            __DIR__.'/../resources/views'     => App::resourcePath('views/vendor/comments'),
             __DIR__.'/../config/comments.php' => App::configPath('comments.php'),
-            __DIR__.'/../resources/lang' => App::resourcePath('lang/vendor/comments'),
+            __DIR__.'/../resources/lang'      => App::resourcePath('lang/vendor/comments'),
         ], 'comments');
     }
 }

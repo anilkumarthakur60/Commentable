@@ -9,7 +9,7 @@ use Spatie\Honeypot\ProtectAgainstSpam;
 describe('Comment controller routes', function () {
     beforeEach(function () {
         $this->user = UserModel::factory()->create([
-            'name' => 'John Doe',
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ]);
         $this->post = PostModel::factory()->create([
@@ -26,41 +26,41 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => PostModel::class,
-                'commentable_id' => $this->post->id,
-                'message' => 'Test comment',
+                'commentable_id'   => $this->post->id,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(201)
             ->assertJson([
                 'data' => [
-                    'comment' => 'Test comment',
-                    'commenter_id' => $this->user->id,
-                    'commenter_type' => UserModel::class,
-                    'commentable_id' => $this->post->id,
+                    'comment'          => 'Test comment',
+                    'commenter_id'     => $this->user->id,
+                    'commenter_type'   => UserModel::class,
+                    'commentable_id'   => $this->post->id,
                     'commentable_type' => PostModel::class,
-                    'approved' => true,
-                    'child_id' => null,
-                    'guest_name' => null,
-                    'guest_email' => null,
-                    'commenter' => [
-                        'id' => $this->user->id,
-                        'name' => $this->user->name,
+                    'approved'         => true,
+                    'child_id'         => null,
+                    'guest_name'       => null,
+                    'guest_email'      => null,
+                    'commenter'        => [
+                        'id'    => $this->user->id,
+                        'name'  => $this->user->name,
                         'email' => $this->user->email,
                     ],
                     'commentable' => [
-                        'id' => $this->post->id,
+                        'id'   => $this->post->id,
                         'name' => $this->post->name,
                     ],
                 ],
             ]);
 
         $this->assertDatabaseHas('comments', [
-            'comment' => 'Test comment',
-            'commenter_id' => $this->user->id,
-            'commenter_type' => UserModel::class,
-            'commentable_id' => $this->post->id,
+            'comment'          => 'Test comment',
+            'commenter_id'     => $this->user->id,
+            'commenter_type'   => UserModel::class,
+            'commentable_id'   => $this->post->id,
             'commentable_type' => PostModel::class,
-            'approved' => true,
+            'approved'         => true,
         ]);
     });
 
@@ -69,39 +69,39 @@ describe('Comment controller routes', function () {
 
         $response = $this->postJson('/comments', [
             'commentable_type' => PostModel::class,
-            'commentable_id' => $this->post->id,
-            'message' => 'Guest comment',
-            'guest_name' => 'John Doe',
-            'guest_email' => 'john@example.com',
+            'commentable_id'   => $this->post->id,
+            'message'          => 'Guest comment',
+            'guest_name'       => 'John Doe',
+            'guest_email'      => 'john@example.com',
         ]);
 
         $response->assertStatus(201)
             ->assertJson([
                 'data' => [
-                    'comment' => 'Guest comment',
-                    'guest_name' => 'John Doe',
-                    'guest_email' => 'john@example.com',
-                    'commentable_id' => $this->post->id,
+                    'comment'          => 'Guest comment',
+                    'guest_name'       => 'John Doe',
+                    'guest_email'      => 'john@example.com',
+                    'commentable_id'   => $this->post->id,
                     'commentable_type' => PostModel::class,
-                    'commenter_id' => null,
-                    'commenter_type' => null,
-                    'approved' => true,
-                    'child_id' => null,
-                    'commenter' => null,
-                    'commentable' => [
-                        'id' => $this->post->id,
+                    'commenter_id'     => null,
+                    'commenter_type'   => null,
+                    'approved'         => true,
+                    'child_id'         => null,
+                    'commenter'        => null,
+                    'commentable'      => [
+                        'id'   => $this->post->id,
                         'name' => $this->post->name,
                     ],
                 ],
             ]);
 
         $this->assertDatabaseHas('comments', [
-            'comment' => 'Guest comment',
-            'guest_name' => 'John Doe',
-            'guest_email' => 'john@example.com',
-            'commentable_id' => $this->post->id,
+            'comment'          => 'Guest comment',
+            'guest_name'       => 'John Doe',
+            'guest_email'      => 'john@example.com',
+            'commentable_id'   => $this->post->id,
             'commentable_type' => PostModel::class,
-            'approved' => true,
+            'approved'         => true,
         ]);
     });
 
@@ -110,10 +110,10 @@ describe('Comment controller routes', function () {
 
         $response = $this->postJson('/comments', [
             'commentable_type' => PostModel::class,
-            'commentable_id' => $this->post->id,
-            'message' => 'Guest comment',
-            'guest_name' => 'John Doe',
-            'guest_email' => 'john@example.com',
+            'commentable_id'   => $this->post->id,
+            'message'          => 'Guest comment',
+            'guest_name'       => 'John Doe',
+            'guest_email'      => 'john@example.com',
         ]);
 
         $response->assertStatus(403);
@@ -151,10 +151,10 @@ describe('Comment controller routes', function () {
 
         $response = $this->postJson('/comments', [
             'commentable_type' => PostModel::class,
-            'commentable_id' => $this->post->id,
-            'message' => 'Guest comment',
-            'guest_name' => 'John Doe',
-            'guest_email' => 'invalid-email',
+            'commentable_id'   => $this->post->id,
+            'message'          => 'Guest comment',
+            'guest_name'       => 'John Doe',
+            'guest_email'      => 'invalid-email',
         ]);
 
         $response->assertStatus(422)
@@ -165,8 +165,8 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => PostModel::class,
-                'commentable_id' => 999999,
-                'message' => 'Test comment',
+                'commentable_id'   => 999999,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(404);
@@ -178,15 +178,15 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => PostModel::class,
-                'commentable_id' => $this->post->id,
-                'message' => 'Test comment',
+                'commentable_id'   => $this->post->id,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(201)
             ->assertJson(['data' => ['approved' => true]]);
 
         $this->assertDatabaseHas('comments', [
-            'comment' => 'Test comment',
+            'comment'  => 'Test comment',
             'approved' => true,
         ]);
     });
@@ -197,15 +197,15 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => PostModel::class,
-                'commentable_id' => $this->post->id,
-                'message' => 'Test comment',
+                'commentable_id'   => $this->post->id,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(201)
             ->assertJson(['data' => ['approved' => false]]);
 
         $this->assertDatabaseHas('comments', [
-            'comment' => 'Test comment',
+            'comment'  => 'Test comment',
             'approved' => false,
         ]);
     });
@@ -218,16 +218,15 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => PostModel::class,
-                'commentable_id' => $this->post->id,
-                'message' => 'Test comment',
+                'commentable_id'   => $this->post->id,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(403);
     });
 
     it('runs afterCreate on model if method exists', function () {
-        $post = new class extends PostModel
-        {
+        $post = new class() extends PostModel {
             public function afterCreate(): void
             {
                 $this->update(['name' => 'Updated after comment']);
@@ -239,13 +238,13 @@ describe('Comment controller routes', function () {
         $response = $this->actingAs($this->user)
             ->postJson('/comments', [
                 'commentable_type' => get_class($post),
-                'commentable_id' => $post->id,
-                'message' => 'Test comment',
+                'commentable_id'   => $post->id,
+                'message'          => 'Test comment',
             ]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('posts', [
-            'id' => $post->id,
+            'id'   => $post->id,
             'name' => 'Updated after comment',
         ]);
     });

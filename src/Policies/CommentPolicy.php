@@ -45,7 +45,7 @@ class CommentPolicy
      */
     public function reply(User $user, Comment $comment): bool
     {
-        if (! Config::get('comments.allow_self_reply', false)) {
+        if (!Config::get('comments.allow_self_reply', false)) {
             return $user->getKey() !== $comment->commenter_id;
         }
 

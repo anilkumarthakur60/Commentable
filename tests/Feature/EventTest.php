@@ -18,7 +18,7 @@ describe('Comment Events', function () {
     it('dispatches CommentCreated when a comment is created', function () {
         Event::fake([CommentCreated::class]);
 
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'Test';
         $comment->commenter()->associate($this->user);
         $comment->commentable()->associate($this->post);
@@ -30,7 +30,7 @@ describe('Comment Events', function () {
     });
 
     it('dispatches CommentUpdated when a comment is updated', function () {
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'Original';
         $comment->commenter()->associate($this->user);
         $comment->commentable()->associate($this->post);
@@ -44,7 +44,7 @@ describe('Comment Events', function () {
     });
 
     it('dispatches CommentDeleted when a comment is deleted', function () {
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'To delete';
         $comment->commenter()->associate($this->user);
         $comment->commentable()->associate($this->post);
@@ -62,7 +62,7 @@ describe('Comment Events', function () {
 
         Event::fake([CommentCreated::class, CommentUpdated::class, CommentDeleted::class]);
 
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'Test';
         $comment->commenter()->associate($this->user);
         $comment->commentable()->associate($this->post);

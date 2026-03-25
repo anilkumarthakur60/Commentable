@@ -37,7 +37,7 @@ return [
     |
     */
     'table_names' => [
-        'comments' => 'comments',
+        'comments'  => 'comments',
         'reactions' => 'comment_reactions',
     ],
 
@@ -51,9 +51,9 @@ return [
     |
     */
     'permissions' => [
-        'create-comment' => [CommentPolicy::class, 'create'],
-        'delete-comment' => [CommentPolicy::class, 'delete'],
-        'edit-comment' => [CommentPolicy::class, 'update'],
+        'create-comment'   => [CommentPolicy::class, 'create'],
+        'delete-comment'   => [CommentPolicy::class, 'delete'],
+        'edit-comment'     => [CommentPolicy::class, 'update'],
         'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
 
@@ -163,7 +163,7 @@ return [
     */
     'reactions' => [
         'enabled' => true,
-        'types' => ['like', 'dislike'],
+        'types'   => ['like', 'dislike'],
     ],
 
     /*
@@ -176,8 +176,8 @@ return [
     |
     */
     'validation' => [
-        'message' => ['required', 'string'],
-        'guest_name' => ['required', 'string', 'max:255'],
+        'message'     => ['required', 'string'],
+        'guest_name'  => ['required', 'string', 'max:255'],
         'guest_email' => ['required', 'string', 'email', 'max:255'],
     ],
 
@@ -236,8 +236,8 @@ return [
     |
     */
     'rate_limiting' => [
-        'enabled' => true,
-        'max_attempts' => 10,
+        'enabled'       => true,
+        'max_attempts'  => 10,
         'decay_minutes' => 1,
     ],
 
@@ -278,8 +278,8 @@ return [
     */
     'avatar' => [
         'provider' => 'gravatar',
-        'size' => 64,
-        'default' => 'mp',
+        'size'     => 64,
+        'default'  => 'mp',
     ],
 
     /*

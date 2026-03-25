@@ -13,7 +13,7 @@ describe('Delete comment', function () {
         $this->otherUser = UserModel::factory()->create();
         $this->post = PostModel::factory()->create();
 
-        $this->comment = new Comment;
+        $this->comment = new Comment();
         $this->comment->comment = 'To be deleted';
         $this->comment->commenter()->associate($this->user);
         $this->comment->commentable()->associate($this->post);

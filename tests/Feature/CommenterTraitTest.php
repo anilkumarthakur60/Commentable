@@ -11,7 +11,7 @@ describe('Commenter Trait', function () {
     });
 
     it('returns all comments by user', function () {
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'User comment';
         $comment->commenter()->associate($this->user);
         $comment->commentable()->associate($this->post);
@@ -22,14 +22,14 @@ describe('Commenter Trait', function () {
     });
 
     it('returns approved comments by user', function () {
-        $approved = new Comment;
+        $approved = new Comment();
         $approved->comment = 'Approved';
         $approved->approved = true;
         $approved->commenter()->associate($this->user);
         $approved->commentable()->associate($this->post);
         $approved->save();
 
-        $unapproved = new Comment;
+        $unapproved = new Comment();
         $unapproved->comment = 'Unapproved';
         $unapproved->approved = false;
         $unapproved->commenter()->associate($this->user);
@@ -41,14 +41,14 @@ describe('Commenter Trait', function () {
     });
 
     it('returns unapproved comments by user', function () {
-        $approved = new Comment;
+        $approved = new Comment();
         $approved->comment = 'Approved';
         $approved->approved = true;
         $approved->commenter()->associate($this->user);
         $approved->commentable()->associate($this->post);
         $approved->save();
 
-        $unapproved = new Comment;
+        $unapproved = new Comment();
         $unapproved->comment = 'Unapproved';
         $unapproved->approved = false;
         $unapproved->commenter()->associate($this->user);
@@ -63,7 +63,7 @@ describe('Commenter Trait', function () {
         $userWithApproved = UserModel::factory()->create();
         $userWithoutComments = UserModel::factory()->create();
 
-        $comment = new Comment;
+        $comment = new Comment();
         $comment->comment = 'Approved';
         $comment->approved = true;
         $comment->commenter()->associate($userWithApproved);

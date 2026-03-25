@@ -38,7 +38,7 @@ class UserModel extends Authenticatable
     ];
 
     protected $casts = [
-        'password' => 'hashed',
+        'password'   => 'hashed',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -57,7 +57,8 @@ class UserModel extends Authenticatable
     }
 
     /**
-     * @param  Builder<UserModel>  $query
+     * @param Builder<UserModel> $query
+     *
      * @return Builder<UserModel>
      */
     public function scopeActive(Builder $query, int $active = 1): Builder
@@ -66,7 +67,8 @@ class UserModel extends Authenticatable
     }
 
     /**
-     * @param  Builder<UserModel>  $query
+     * @param Builder<UserModel> $query
+     *
      * @return Builder<UserModel>
      */
     public function scopeStatus(Builder $query, int $status = 1): Builder
@@ -75,7 +77,8 @@ class UserModel extends Authenticatable
     }
 
     /**
-     * @param  Builder<UserModel>  $query
+     * @param Builder<UserModel> $query
+     *
      * @return Builder<UserModel>
      */
     public function scopeHasPosts(Builder $query): Builder
@@ -90,8 +93,8 @@ class UserModel extends Authenticatable
             /** @var array<string, mixed> $postData */
             $postData = $request->input('post');
             $this->posts()->create([
-                'name' => $postData['name'],
-                'desc' => $postData['desc'],
+                'name'   => $postData['name'],
+                'desc'   => $postData['desc'],
                 'status' => $postData['status'],
                 'active' => $postData['active'],
             ]);

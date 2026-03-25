@@ -13,7 +13,7 @@ describe('Comment Policy', function () {
         $this->admin = UserModel::factory()->create(['is_admin' => true]);
         $this->post = PostModel::factory()->create();
 
-        $this->comment = new Comment;
+        $this->comment = new Comment();
         $this->comment->comment = 'Test comment';
         $this->comment->commenter()->associate($this->user);
         $this->comment->commentable()->associate($this->post);

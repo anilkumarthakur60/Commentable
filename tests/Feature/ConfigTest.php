@@ -21,8 +21,8 @@ describe('Config-driven behavior', function () {
             $this->actingAs($this->user)
                 ->postJson('/comments', [
                     'commentable_type' => PostModel::class,
-                    'commentable_id' => $this->post->id,
-                    'message' => 'Auto-approved',
+                    'commentable_id'   => $this->post->id,
+                    'message'          => 'Auto-approved',
                 ])->assertJson(['data' => ['approved' => true]]);
         });
 
@@ -32,8 +32,8 @@ describe('Config-driven behavior', function () {
             $this->actingAs($this->user)
                 ->postJson('/comments', [
                     'commentable_type' => PostModel::class,
-                    'commentable_id' => $this->post->id,
-                    'message' => 'Needs approval',
+                    'commentable_id'   => $this->post->id,
+                    'message'          => 'Needs approval',
                 ])->assertJson(['data' => ['approved' => false]]);
         });
     });
@@ -45,8 +45,8 @@ describe('Config-driven behavior', function () {
             $response = $this->actingAs($this->user)
                 ->postJson('/comments', [
                     'commentable_type' => PostModel::class,
-                    'commentable_id' => $this->post->id,
-                    'message' => 'Test',
+                    'commentable_id'   => $this->post->id,
+                    'message'          => 'Test',
                 ]);
 
             $response->assertStatus(200);
@@ -57,7 +57,7 @@ describe('Config-driven behavior', function () {
         it('uses configurable response messages', function () {
             Config::set('comments.response_messages.deleted', 'Comment removed.');
 
-            $comment = new Comment;
+            $comment = new Comment();
             $comment->comment = 'To delete';
             $comment->commenter()->associate($this->user);
             $comment->commentable()->associate($this->post);
@@ -77,8 +77,8 @@ describe('Config-driven behavior', function () {
             $response = $this->actingAs($this->user)
                 ->postJson('/comments', [
                     'commentable_type' => PostModel::class,
-                    'commentable_id' => $this->post->id,
-                    'message' => 'Short',
+                    'commentable_id'   => $this->post->id,
+                    'message'          => 'Short',
                 ]);
 
             $response->assertStatus(422)
@@ -88,17 +88,17 @@ describe('Config-driven behavior', function () {
 
     describe('table_names', function () {
         it('Comment model uses configured table name', function () {
-            expect((new Comment)->getTable())->toBe('comments');
+            expect((new Comment())->getTable())->toBe('comments');
 
             Config::set('comments.table_names.comments', 'app_comments');
-            expect((new Comment)->getTable())->toBe('app_comments');
+            expect((new Comment())->getTable())->toBe('app_comments');
         });
 
         it('CommentReaction model uses configured table name', function () {
-            expect((new CommentReaction)->getTable())->toBe('comment_reactions');
+            expect((new CommentReaction())->getTable())->toBe('comment_reactions');
 
             Config::set('comments.table_names.reactions', 'app_reactions');
-            expect((new CommentReaction)->getTable())->toBe('app_reactions');
+            expect((new CommentReaction())->getTable())->toBe('app_reactions');
         });
     });
 

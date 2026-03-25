@@ -48,10 +48,10 @@ class ReactionService implements ReactionServiceContract
             }
         } else {
             $reactionClass::create([
-                'comment_id' => $comment->getKey(),
-                'reactor_id' => $reactorId,
+                'comment_id'   => $comment->getKey(),
+                'reactor_id'   => $reactorId,
                 'reactor_type' => $reactorType,
-                'type' => $type,
+                'type'         => $type,
             ]);
             $userReaction = $type;
         }
@@ -72,7 +72,7 @@ class ReactionService implements ReactionServiceContract
         }
 
         return [
-            'reactions' => $counts,
+            'reactions'     => $counts,
             'user_reaction' => $userReaction,
         ];
     }

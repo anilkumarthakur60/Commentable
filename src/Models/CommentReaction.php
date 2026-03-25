@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Config;
  * @property int|string $id
  * @property int|string $comment_id
  * @property int|string $reactor_id
- * @property string $reactor_type
- * @property string $type
+ * @property string     $reactor_type
+ * @property string     $type
  */
 class CommentReaction extends Model
 {

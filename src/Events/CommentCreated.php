@@ -11,5 +11,6 @@ class CommentCreated
 
     public function __construct(
         public readonly Comment $comment
-    ) {}
+    ) {
+    }
 }
