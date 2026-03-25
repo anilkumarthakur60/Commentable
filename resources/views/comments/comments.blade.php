@@ -11,7 +11,7 @@
     $reactionsEnabled = $reactionsEnabled ?? Config::get('comments.reactions.enabled', true);
     $reactionTypes    = $reactionTypes    ?? Config::get('comments.reactions.types', ['like', 'dislike']);
     $configMaxDepth   = $maxIndentationLevel ?? Config::get('comments.max_depth', 3);
-    $configSort       = $sort ?? Config::get('comments.sort', 'latest');
+    $configSort       = request()->query('sort', $sort ?? Config::get('comments.sort', 'latest'));
     $routePrefix      = Config::get('comments.route_prefix', 'comments');
 
     // Eager-load reactions once to avoid N+1 per comment — only when feature is on
@@ -709,7 +709,7 @@
         </div>
 
         @if($allComments->count() > 1)
-            <a href="?sort={{ $configSort === 'latest' ? 'oldest' : 'latest' }}" class="cc-sort-btn" title="{{ $configSort === 'latest' ? __('comments::comments.sort_oldest') : __('comments::comments.sort_newest') }}">
+            <a href="{{ request()->fullUrlWithQuery(['sort' => $configSort === 'latest' ? 'oldest' : 'latest', 'page' => 1]) }}" class="cc-sort-btn" title="{{ $configSort === 'latest' ? __('comments::comments.sort_oldest') : __('comments::comments.sort_newest') }}">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5m4 0l4 4m0 0l4-4m-4 4V4"/>
                 </svg>
@@ -723,9 +723,6 @@
     @endif
 
     @php
-        // Allow sort override from query string
-        $configSort = request()->query('sort', $configSort);
-
         $allComments = $configSort === 'oldest'
             ? $allComments->sortBy('created_at')
             : $allComments->sortByDesc('created_at');
