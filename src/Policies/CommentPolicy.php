@@ -4,6 +4,7 @@ namespace Anil\Comments\Policies;
 
 use Anil\Comments\Models\Comment;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Config;
 
 class CommentPolicy
 {
@@ -26,7 +27,7 @@ class CommentPolicy
     /**
      * A user may delete their own comment.
      *
-     * Users with an `is_admin` attribute set to true may delete any comment.
+     * Users detected as admin via the configured attribute may delete any comment.
      */
     public function delete(User $user, Comment $comment): bool
     {
@@ -38,20 +39,34 @@ class CommentPolicy
     }
 
     /**
-     * A user may reply to any comment that is not their own.
+     * A user may reply to a comment.
+     *
+     * Self-reply behaviour is controlled by the 'allow_self_reply' config key.
      */
     public function reply(User $user, Comment $comment): bool
     {
-        return $user->getKey() !== $comment->commenter_id;
+        if (! Config::get('comments.allow_self_reply', false)) {
+            return $user->getKey() !== $comment->commenter_id;
+        }
+
+        return true;
     }
 
     /**
      * Check whether the user is considered an administrator.
      *
-     * Override this policy or add your own to customise admin detection.
+     * Uses the attribute name from config ('admin_attribute').
+     * Returns false when admin_attribute is set to null.
      */
     protected function isAdmin(User $user): bool
     {
-        return (bool) $user->getAttribute('is_admin');
+        /** @var string|null $attribute */
+        $attribute = Config::get('comments.admin_attribute', 'is_admin');
+
+        if ($attribute === null) {
+            return false;
+        }
+
+        return (bool) $user->getAttribute($attribute);
     }
 }

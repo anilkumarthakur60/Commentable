@@ -6,8 +6,11 @@ use Illuminate\Support\Facades\Route;
 /** @var class-string $controller */
 $controller = Config::get('comments.controller');
 
+/** @var string $prefix */
+$prefix = Config::get('comments.route_prefix', 'comments');
+
 Route::controller($controller)
-    ->prefix('comments')
+    ->prefix($prefix)
     ->as('comments.')
     ->group(function (): void {
         Route::post('', 'store')->name('store');

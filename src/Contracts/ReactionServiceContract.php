@@ -2,8 +2,8 @@
 
 namespace Anil\Comments\Contracts;
 
+use Anil\Comments\Http\Requests\ReactRequest;
 use Anil\Comments\Models\Comment;
-use Illuminate\Http\Request;
 
 interface ReactionServiceContract
 {
@@ -12,5 +12,5 @@ interface ReactionServiceContract
      *
      * @return array{reactions: array<string, int>, user_reaction: string|null}
      */
-    public function react(Request $request, Comment $comment): array;
+    public function react(ReactRequest $request, Comment $comment): array;
 }

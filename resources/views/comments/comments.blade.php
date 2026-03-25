@@ -11,7 +11,8 @@
     $reactionsEnabled = $reactionsEnabled ?? Config::get('comments.reactions.enabled', true);
     $reactionTypes    = $reactionTypes    ?? Config::get('comments.reactions.types', ['like', 'dislike']);
     $configMaxDepth   = $maxIndentationLevel ?? Config::get('comments.max_depth', 3);
-    $configSort       = $sort ?? Config::get('comments.sort', 'latest');
+    $configSort       = request()->query('sort', $sort ?? Config::get('comments.sort', 'latest'));
+    $routePrefix      = Config::get('comments.route_prefix', 'comments');
 
     // Eager-load reactions once to avoid N+1 per comment — only when feature is on
     if ($reactionsEnabled) {
@@ -19,6 +20,7 @@
     }
 @endphp
 
+@once
 <style>
     /* ── Comment Component — Framework-Agnostic ─────────────────────────────── */
     .cc-wrap *,
@@ -31,7 +33,7 @@
         background: #ffffff;
         border-radius: 14px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, .07), 0 4px 16px rgba(0, 0, 0, .06);
-        padding: 8px 8px;
+        padding: 24px 24px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         font-size: 14px;
         color: #1a1a1a;
@@ -63,6 +65,11 @@
         font-size: 14px;
         font-family: inherit;
         color: #333;
+        transition: border-color .2s;
+    }
+
+    .cc-input:focus {
+        border-bottom-color: #ea580c;
     }
 
     .cc-input::placeholder {
@@ -82,6 +89,10 @@
         min-height: 52px;
     }
 
+    .cc-textarea:focus {
+        outline: none;
+    }
+
     .cc-textarea::placeholder {
         color: #aaa;
     }
@@ -89,44 +100,9 @@
     .cc-toolbar {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         border-top: 1px solid #e8e8e8;
         padding-top: 10px;
-    }
-
-    .cc-toolbar-left {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-    }
-
-    .cc-tool-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #666;
-        padding: 5px 7px;
-        border-radius: 5px;
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1;
-        transition: background .15s, color .15s;
-        font-family: inherit;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .cc-tool-btn:hover {
-        background: #e0e0e0;
-        color: #333;
-    }
-
-    .cc-tool-sep {
-        width: 1px;
-        height: 16px;
-        background: #d8d8d8;
-        margin: 0 8px;
-        flex-shrink: 0;
     }
 
     .cc-submit-btn {
@@ -149,6 +125,11 @@
 
     .cc-submit-btn:active {
         transform: scale(.97);
+    }
+
+    .cc-submit-btn:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
     }
 
     .cc-error {
@@ -195,11 +176,16 @@
         color: #fff;
     }
 
+    .cc-auth-link:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
+    }
+
     /* ── Divider ── */
     .cc-divider {
         border: none;
         border-top: 1px solid #ebebeb;
-        margin: 28px 0;
+        margin: 24px 0;
     }
 
     /* ── Header ── */
@@ -238,17 +224,26 @@
         align-items: center;
         gap: 4px;
         background: none;
-        border: none;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
         cursor: pointer;
-        color: #444;
+        color: #555;
         font-size: 13px;
         font-weight: 500;
         font-family: inherit;
-        padding: 0;
+        padding: 4px 10px;
+        transition: background .15s, border-color .15s;
     }
 
     .cc-sort-btn:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
         color: #111;
+    }
+
+    .cc-sort-btn:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
     }
 
     /* ── Comments list ── */
@@ -352,10 +347,29 @@
     .cc-text {
         font-size: 14px;
         color: #333;
-        line-height: 1.6;
+        line-height: 1.7;
         word-break: break-word;
-        white-space: pre-wrap;
         margin: 0 0 10px;
+    }
+
+    .cc-text p {
+        margin: 0 0 8px;
+    }
+
+    .cc-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    .cc-text code {
+        background: #f0f0f0;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+
+    .cc-text a {
+        color: #ea580c;
+        text-decoration: underline;
     }
 
     /* ── Action row ── */
@@ -376,13 +390,19 @@
         color: #777;
         font-size: 13px;
         font-family: inherit;
-        padding: 0;
+        padding: 2px 0;
         transition: color .15s;
         line-height: 1;
     }
 
     .cc-action-btn:hover {
         color: #ea580c;
+    }
+
+    .cc-action-btn:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
+        border-radius: 3px;
     }
 
     .cc-action-btn.cc-reaction-active {
@@ -392,6 +412,11 @@
 
     .cc-action-btn[data-type="dislike"].cc-reaction-active {
         color: #64748b;
+    }
+
+    .cc-react-btn:disabled {
+        opacity: .5;
+        cursor: wait;
     }
 
     /* ── Dropdown ── */
@@ -404,16 +429,23 @@
         border: none;
         cursor: pointer;
         color: #aaa;
-        padding: 0 3px;
+        padding: 2px 5px;
         font-size: 16px;
         letter-spacing: 1.5px;
         font-family: inherit;
         line-height: 1;
-        transition: color .15s;
+        border-radius: 4px;
+        transition: color .15s, background .15s;
     }
 
     .cc-more-btn:hover {
         color: #555;
+        background: #f0f0f0;
+    }
+
+    .cc-more-btn:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
     }
 
     .cc-dropdown-menu {
@@ -428,6 +460,7 @@
         z-index: 200;
         padding: 4px 0;
         border: 1px solid rgba(0, 0, 0, .06);
+        animation: ccFadeIn .12s ease;
     }
 
     .cc-dropdown.cc-open .cc-dropdown-menu {
@@ -457,17 +490,30 @@
         color: #dc2626;
     }
 
+    .cc-dropdown-item.cc-danger:hover {
+        background: #fef2f2;
+    }
+
     /* ── Inline forms (reply / edit) ── */
     .cc-inline-form {
-        display: none;
         margin-top: 12px;
         background: #f6f6f6;
         border-radius: 8px;
         padding: 12px 16px 12px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height .25s ease, opacity .2s ease, padding .25s ease, margin .25s ease;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
     }
 
     .cc-inline-form.cc-open {
-        display: block;
+        max-height: 300px;
+        opacity: 1;
+        padding: 12px 16px 12px;
+        margin-top: 12px;
     }
 
     .cc-inline-textarea {
@@ -508,6 +554,11 @@
 
     .cc-cancel-btn:hover {
         background: #ececec;
+    }
+
+    .cc-cancel-btn:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
     }
 
     /* ── Nested replies ── */
@@ -586,10 +637,23 @@
         color: #c2410c;
     }
 
+    .cc-show-more-link:focus-visible {
+        outline: 2px solid #ea580c;
+        outline-offset: 2px;
+        border-radius: 3px;
+    }
+
+    /* ── Animation ── */
+    @keyframes ccFadeIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
     /* ── Responsive ── */
     @media (max-width: 520px) {
         .cc-wrap {
-            padding: 20px 16px;
+            padding: 16px 14px;
+            border-radius: 10px;
         }
 
         .cc-guest-fields {
@@ -609,10 +673,17 @@
         .cc-replies > .cc-comment:last-child::after {
             left: -26px;
         }
+
+        .cc-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
     }
 </style>
+@endonce
 
-<div class="cc-wrap" data-csrf="{{ csrf_token() }}">
+<div class="cc-wrap" data-csrf="{{ csrf_token() }}" data-route-prefix="{{ $routePrefix }}">
     {{-- Comment form --}}
     <div style="margin-bottom: 4px;">
         @auth
@@ -633,9 +704,18 @@
     {{-- Header --}}
     <div class="cc-header">
         <div class="cc-header-left">
-            <h2 class="cc-title">Comments</h2>
+            <h2 class="cc-title">@lang('comments::comments.comments')</h2>
             <span class="cc-count-badge">{{ $allComments->count() }}</span>
         </div>
+
+        @if($allComments->count() > 1)
+            <a href="{{ request()->fullUrlWithQuery(['sort' => $configSort === 'latest' ? 'oldest' : 'latest', 'page' => 1]) }}" class="cc-sort-btn" title="{{ $configSort === 'latest' ? __('comments::comments.sort_oldest') : __('comments::comments.sort_newest') }}">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h5m4 0l4 4m0 0l4-4m-4 4V4"/>
+                </svg>
+                {{ $configSort === 'latest' ? __('comments::comments.sort_newest') : __('comments::comments.sort_oldest') }}
+            </a>
+        @endif
     </div>
 
     @if($allComments->isEmpty())
@@ -647,7 +727,9 @@
             ? $allComments->sortBy('created_at')
             : $allComments->sortByDesc('created_at');
 
-        if (isset($perPage)) {
+        $perPage = $perPage ?? Config::get('comments.per_page');
+
+        if ($perPage) {
             $page             = (int) request()->query('page', 1) - 1;
             $parentComments   = $allComments->whereStrict('child_id', null);
             $slicedParents    = $parentComments->slice($page * $perPage, $perPage);
@@ -681,20 +763,21 @@
         @endforeach
     </div>
 
-    @isset($perPage)
+    @if(isset($perPage) && $perPage)
         @if($grouped_comments->hasPages() && $grouped_comments->hasMorePages())
             <div class="cc-show-more">
                 <a href="{{ $grouped_comments->nextPageUrl() }}" class="cc-show-more-link">
-                    Show more
+                    @lang('comments::comments.show_more')
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </a>
             </div>
         @endif
-    @endisset
+    @endif
 </div>
 
+@once
 <script>
     (function () {
         'use strict';
@@ -717,6 +800,16 @@
                 return;
             }
             closeAllDropdowns(null);
+        });
+
+        // Close dropdown on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeAllDropdowns(null);
+                document.querySelectorAll('.cc-inline-form.cc-open').forEach(function (f) {
+                    f.classList.remove('cc-open');
+                });
+            }
         });
 
         // ── Inline form toggle (reply / edit) ─────────────────────────────────
@@ -759,19 +852,20 @@
 
             var commentId = btn.dataset.comment;
             var type = btn.dataset.type;
-            var wrap = document.querySelector('.cc-wrap');
+            var wrap = btn.closest('.cc-wrap');
             var csrf = wrap ? wrap.dataset.csrf : '';
+            var routePrefix = wrap ? wrap.dataset.routePrefix : 'comments';
 
             // Optimistic UI — disable buttons while request is in flight
             var commentEl = document.getElementById('comment-' + commentId);
             var allReactBtns = commentEl
-                ? commentEl.querySelectorAll('.cc-react-btn')
+                ? commentEl.querySelectorAll(':scope > .cc-comment-inner .cc-react-btn')
                 : [];
             allReactBtns.forEach(function (b) {
                 b.disabled = true;
             });
 
-            fetch('/comments/' + commentId + '/react', {
+            fetch('/' + routePrefix + '/' + commentId + '/react', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -791,7 +885,7 @@
                     if (!data || !commentEl) return;
 
                     // Update every reaction button dynamically — works for any configured types
-                    commentEl.querySelectorAll('.cc-react-btn').forEach(function (btn) {
+                    commentEl.querySelectorAll(':scope > .cc-comment-inner .cc-react-btn').forEach(function (btn) {
                         var t = btn.dataset.type;
                         btn.querySelector('.cc-reaction-count').textContent =
                             (data.reactions && data.reactions[t] !== undefined) ? data.reactions[t] : 0;
@@ -808,3 +902,4 @@
         });
     })();
 </script>
+@endonce

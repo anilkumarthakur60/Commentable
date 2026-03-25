@@ -2,8 +2,10 @@
 
 namespace Anil\Comments\Contracts;
 
+use Anil\Comments\Http\Requests\ReplyCommentRequest;
+use Anil\Comments\Http\Requests\StoreCommentRequest;
+use Anil\Comments\Http\Requests\UpdateCommentRequest;
 use Anil\Comments\Models\Comment;
-use Illuminate\Http\Request;
 use Throwable;
 
 interface CommentServiceContract
@@ -13,14 +15,14 @@ interface CommentServiceContract
      *
      * @throws Throwable
      */
-    public function store(Request $request): Comment;
+    public function store(StoreCommentRequest $request): Comment;
 
     /**
      * Updates the message of an existing comment.
      *
      * @throws Throwable
      */
-    public function update(Request $request, Comment $comment): Comment;
+    public function update(UpdateCommentRequest $request, Comment $comment): Comment;
 
     /**
      * Deletes a comment (soft or hard based on config).
@@ -34,5 +36,5 @@ interface CommentServiceContract
      *
      * @throws Throwable
      */
-    public function reply(Request $request, Comment $comment): Comment;
+    public function reply(ReplyCommentRequest $request, Comment $comment): Comment;
 }

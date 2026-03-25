@@ -7,10 +7,10 @@
 
         @if (isset($guest_commenting) && $guest_commenting === true)
             <div class="cc-guest-fields">
-                <input type="text" class="cc-input" name="guest_name" value="{{ old('guest_name') }}" placeholder="Name"
-                    required>
-                <input type="email" class="cc-input" name="guest_email" value="{{ old('guest_email') }}" placeholder="Email"
-                    required>
+                <input type="text" class="cc-input" name="guest_name" value="{{ old('guest_name') }}"
+                    placeholder="@lang('comments::comments.enter_your_name_here')" required>
+                <input type="email" class="cc-input" name="guest_email" value="{{ old('guest_email') }}"
+                    placeholder="@lang('comments::comments.enter_your_email_here')" required>
             </div>
             @if ($errors->has('guest_name') || $errors->has('guest_email'))
                 <div class="cc-error" style="margin-bottom:10px;">
@@ -19,14 +19,15 @@
             @endif
         @endif
 
-        <textarea class="cc-textarea" name="message" rows="2" placeholder="Add comment..." required></textarea>
+        <textarea class="cc-textarea" name="message" rows="2" placeholder="@lang('comments::comments.add_comment')"
+            required>{{ old('message') }}</textarea>
 
         @error('message')
             <div class="cc-error" style="margin-bottom:8px;">{{ $message }}</div>
         @enderror
 
-        <div class="cc-toolbar" style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="cc-submit-btn">Submit</button>
+        <div class="cc-toolbar">
+            <button type="submit" class="cc-submit-btn">@lang('comments::comments.submit')</button>
         </div>
     </form>
 </div>

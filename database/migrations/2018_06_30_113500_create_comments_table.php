@@ -17,7 +17,10 @@ return new class extends Migration
             $table->string('guest_email')->nullable();
             $table->longText('comment');
             $table->boolean('approved')->default(true);
-            $table->foreignIdFor(Comment::class, 'child_id')->nullable()->constrained('comments')->cascadeOnDelete();
+            $table->foreignIdFor(Comment::class, 'child_id')
+                ->nullable()
+                ->constrained('comments')
+                ->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

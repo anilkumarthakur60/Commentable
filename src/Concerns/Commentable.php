@@ -6,6 +6,7 @@ use Anil\Comments\Models\Comment;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
@@ -91,6 +92,29 @@ trait Commentable
             ->whereNull('child_id')
             ->with(['children', 'commenter'])
             ->get();
+    }
+
+    /**
+     * Get paginated top-level comments with their replies eager-loaded.
+     *
+     * Uses the per_page value from config when no override is given.
+     *
+     * @return LengthAwarePaginator<int, Comment>
+     */
+    public function paginatedComments(?int $perPage = null): LengthAwarePaginator
+    {
+        /** @var int $configPerPage */
+        $configPerPage = Config::get('comments.per_page', 10);
+        $perPage ??= $configPerPage;
+
+        $sort = Config::get('comments.sort', 'latest');
+        $orderDirection = $sort === 'oldest' ? 'asc' : 'desc';
+
+        return $this->comments()
+            ->whereNull('child_id')
+            ->with(['children', 'commenter', 'reactions'])
+            ->orderBy('created_at', $orderDirection)
+            ->paginate($perPage);
     }
 
     /**

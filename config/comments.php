@@ -29,6 +29,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Table Names
+    |--------------------------------------------------------------------------
+    |
+    | Customise the database table names used by the package.
+    | Useful when you have naming conventions or conflicts.
+    |
+    */
+    'table_names' => [
+        'comments' => 'comments',
+        'reactions' => 'comment_reactions',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Permissions / Policy
     |--------------------------------------------------------------------------
     |
@@ -42,6 +56,18 @@ return [
         'edit-comment' => [CommentPolicy::class, 'update'],
         'reply-to-comment' => [CommentPolicy::class, 'reply'],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Attribute
+    |--------------------------------------------------------------------------
+    |
+    | The attribute on the User model used to determine admin status.
+    | Set to null and override CommentPolicy if you use a different
+    | admin detection method (e.g. roles/permissions package).
+    |
+    */
+    'admin_attribute' => 'is_admin',
 
     /*
     |--------------------------------------------------------------------------
@@ -63,6 +89,16 @@ return [
     |
     */
     'routes' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Prefix
+    |--------------------------------------------------------------------------
+    |
+    | The URL prefix for all comment routes (e.g. /comments, /api/comments).
+    |
+    */
+    'route_prefix' => 'comments',
 
     /*
     |--------------------------------------------------------------------------
@@ -159,6 +195,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allow Self Reply
+    |--------------------------------------------------------------------------
+    |
+    | When false, users cannot reply to their own comments.
+    | Set to true to allow users to reply to their own comments.
+    |
+    */
+    'allow_self_reply' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Sort Order
     |--------------------------------------------------------------------------
     |
@@ -167,6 +214,18 @@ return [
     |
     */
     'sort' => 'latest',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    |
+    | Default number of top-level comments per page. Set to null to disable
+    | pagination entirely. Can be overridden per-view:
+    |   @comments(['model' => $post, 'perPage' => 20])
+    |
+    */
+    'per_page' => 10,
 
     /*
     |--------------------------------------------------------------------------
@@ -191,6 +250,51 @@ return [
     |
     */
     'middleware' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, comment text is parsed as Markdown before rendering.
+    |
+    */
+    'markdown' => [
+        'enabled' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Avatar
+    |--------------------------------------------------------------------------
+    |
+    | Configure the avatar displayed alongside each comment.
+    |
+    | provider  — 'gravatar' (default) or null to disable.
+    | size      — avatar dimensions in pixels.
+    | default   — Gravatar fallback style (mp, identicon, monsterid, wavatar,
+    |             retro, robohash, blank). See gravatar.com docs.
+    |
+    */
+    'avatar' => [
+        'provider' => 'gravatar',
+        'size' => 64,
+        'default' => 'mp',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Events
+    |--------------------------------------------------------------------------
+    |
+    | Toggle the dispatching of comment events (CommentCreated, CommentUpdated,
+    | CommentDeleted). Disable if you don't use event listeners and want to
+    | reduce overhead.
+    |
+    */
+    'events' => [
+        'enabled' => true,
+    ],
 
     /*
     |--------------------------------------------------------------------------
