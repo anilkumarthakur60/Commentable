@@ -4,12 +4,15 @@ namespace Anil\Comments\Http\Controllers;
 
 use Anil\Comments\Contracts\CommentServiceContract;
 use Anil\Comments\Contracts\ReactionServiceContract;
+use Anil\Comments\Http\Requests\ReactRequest;
+use Anil\Comments\Http\Requests\ReplyCommentRequest;
+use Anil\Comments\Http\Requests\StoreCommentRequest;
+use Anil\Comments\Http\Requests\UpdateCommentRequest;
 use Anil\Comments\Http\Resources\CommentResource;
 use Anil\Comments\Models\Comment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -29,7 +32,7 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function store(Request $request): RedirectResponse|CommentResource|JsonResponse
+    public function store(StoreCommentRequest $request): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->store($request);
 
@@ -50,7 +53,7 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function update(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
+    public function update(UpdateCommentRequest $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $comment = $this->commentService->update($request, $comment);
 
@@ -92,20 +95,11 @@ class WebCommentController extends CommentController
      * Toggles a reaction on a comment.
      *
      * Returns 404 when reactions are disabled in config.
-     * Returns 401 when the user is not authenticated.
      */
-    public function react(Request $request, Comment $comment): JsonResponse|RedirectResponse
+    public function react(ReactRequest $request, Comment $comment): JsonResponse|RedirectResponse
     {
         if (! Config::get('comments.reactions.enabled', true)) {
             abort(404);
-        }
-
-        if (! Auth::check()) {
-            if ($request->wantsJson()) {
-                return response()->json(['message' => 'Unauthenticated.'], 401);
-            }
-
-            return Redirect::route('login');
         }
 
         $result = $this->reactionService->react($request, $comment);
@@ -122,7 +116,7 @@ class WebCommentController extends CommentController
      *
      * @throws Throwable
      */
-    public function reply(Request $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
+    public function reply(ReplyCommentRequest $request, Comment $comment): RedirectResponse|CommentResource|JsonResponse
     {
         $reply = $this->commentService->reply($request, $comment);
 

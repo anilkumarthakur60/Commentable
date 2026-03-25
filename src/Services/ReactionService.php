@@ -3,14 +3,11 @@
 namespace Anil\Comments\Services;
 
 use Anil\Comments\Contracts\ReactionServiceContract;
+use Anil\Comments\Http\Requests\ReactRequest;
 use Anil\Comments\Models\Comment;
 use Anil\Comments\Models\CommentReaction;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 class ReactionService implements ReactionServiceContract
 {
@@ -24,17 +21,10 @@ class ReactionService implements ReactionServiceContract
      *
      * @return array{reactions: array<string, int>, user_reaction: string|null}
      */
-    public function react(Request $request, Comment $comment): array
+    public function react(ReactRequest $request, Comment $comment): array
     {
-        /** @var list<string> $allowedTypes */
-        $allowedTypes = Config::get('comments.reactions.types', ['like', 'dislike']);
-
-        Validator::make($request->all(), [
-            'type' => ['required', 'string', Rule::in($allowedTypes)],
-        ])->validate();
-
         /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
         $reactorId = $user->getKey();
         $reactorType = $user->getMorphClass();
         $type = $request->string('type')->toString();
@@ -67,6 +57,9 @@ class ReactionService implements ReactionServiceContract
         }
 
         $comment->load('reactions');
+
+        /** @var list<string> $allowedTypes */
+        $allowedTypes = Config::get('comments.reactions.types', ['like', 'dislike']);
 
         /** @var array<string, int> $counts */
         $counts = $comment->reactions

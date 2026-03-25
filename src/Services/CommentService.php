@@ -3,14 +3,15 @@
 namespace Anil\Comments\Services;
 
 use Anil\Comments\Contracts\CommentServiceContract;
+use Anil\Comments\Exceptions\GuestCommentingDisabledException;
+use Anil\Comments\Exceptions\MaxDepthExceededException;
+use Anil\Comments\Http\Requests\ReplyCommentRequest;
+use Anil\Comments\Http\Requests\StoreCommentRequest;
+use Anil\Comments\Http\Requests\UpdateCommentRequest;
 use Anil\Comments\Models\Comment;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class CommentService implements CommentServiceContract
@@ -18,27 +19,14 @@ class CommentService implements CommentServiceContract
     /**
      * Handles creating a new comment for a given model.
      *
+     * @throws GuestCommentingDisabledException
      * @throws Throwable
      */
-    public function store(Request $request): Comment
+    public function store(StoreCommentRequest $request): Comment
     {
-        if (! Config::get('comments.guest_commenting')) {
-            Gate::authorize('create-comment', Comment::class);
+        if (! $request->user() && ! Config::get('comments.guest_commenting')) {
+            throw new GuestCommentingDisabledException;
         }
-
-        $guestRules = [];
-        if (! $request->user()) {
-            $guestRules = [
-                'guest_name' => Config::get('comments.validation.guest_name', ['required', 'string', 'max:255']),
-                'guest_email' => Config::get('comments.validation.guest_email', ['required', 'string', 'email', 'max:255']),
-            ];
-        }
-
-        Validator::make($request->all(), array_merge($guestRules, [
-            'commentable_type' => ['required', 'string'],
-            'commentable_id' => ['required', 'min:1'],
-            'message' => Config::get('comments.validation.message', ['required', 'string']),
-        ]))->validate();
 
         /** @var class-string<Model> $commentableClass */
         $commentableClass = $request->string('commentable_type')->toString();
@@ -78,14 +66,8 @@ class CommentService implements CommentServiceContract
      *
      * @throws Throwable
      */
-    public function update(Request $request, Comment $comment): Comment
+    public function update(UpdateCommentRequest $request, Comment $comment): Comment
     {
-        Gate::authorize('edit-comment', $comment);
-
-        Validator::make($request->all(), [
-            'message' => Config::get('comments.validation.message', ['required', 'string']),
-        ])->validate();
-
         return DB::transaction(function () use ($request, $comment): Comment {
             $comment->update([
                 'comment' => $request->string('message')->toString(),
@@ -106,8 +88,6 @@ class CommentService implements CommentServiceContract
      */
     public function destroy(Comment $comment): void
     {
-        Gate::authorize('delete-comment', $comment);
-
         DB::transaction(function () use ($comment): void {
             if (method_exists($comment, 'beforeDelete')) {
                 $comment->beforeDelete();
@@ -128,15 +108,12 @@ class CommentService implements CommentServiceContract
     /**
      * Handles creating a reply to an existing comment.
      *
+     * @throws MaxDepthExceededException
      * @throws Throwable
      */
-    public function reply(Request $request, Comment $comment): Comment
+    public function reply(ReplyCommentRequest $request, Comment $comment): Comment
     {
-        Gate::authorize('reply-to-comment', $comment);
-
-        Validator::make($request->all(), [
-            'message' => Config::get('comments.validation.message', ['required', 'string']),
-        ])->validate();
+        $this->enforceMaxDepth($comment);
 
         /** @var class-string<Comment> $commentClass */
         $commentClass = Config::get('comments.model');
@@ -144,7 +121,7 @@ class CommentService implements CommentServiceContract
         return DB::transaction(function () use ($request, $comment, $commentClass): Comment {
             /** @var Comment $reply */
             $reply = new $commentClass;
-            $reply->commenter()->associate(Auth::user());
+            $reply->commenter()->associate($request->user());
             $reply->commentable()->associate($comment->commentable);
             $reply->parent()->associate($comment);
             $reply->comment = $request->string('message')->toString();
@@ -157,5 +134,33 @@ class CommentService implements CommentServiceContract
 
             return $reply;
         });
+    }
+
+    /**
+     * Calculate the depth of a comment in the thread and enforce the max depth.
+     *
+     * @throws MaxDepthExceededException
+     */
+    protected function enforceMaxDepth(Comment $comment): void
+    {
+        /** @var int $maxDepth */
+        $maxDepth = Config::get('comments.max_depth', 3);
+
+        $depth = 0;
+        $current = $comment;
+
+        while ($current->child_id !== null) {
+            $depth++;
+            /** @var Comment|null $parent */
+            $parent = $current->parent;
+            if ($parent === null) {
+                break;
+            }
+            $current = $parent;
+        }
+
+        if ($depth >= $maxDepth) {
+            throw new MaxDepthExceededException($maxDepth);
+        }
     }
 }

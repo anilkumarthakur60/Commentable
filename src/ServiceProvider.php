@@ -111,6 +111,10 @@ class ServiceProvider extends LaravelServiceProvider
      */
     protected function registerPublishables(): void
     {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
         $this->publishes([
             __DIR__.'/../database/migrations' => App::databasePath('migrations'),
         ], 'comments-migrations');

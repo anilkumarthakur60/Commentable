@@ -5,6 +5,7 @@ namespace Anil\Comments\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Config;
 
 /**
  * @property int|string $id
@@ -28,6 +29,14 @@ class CommentReaction extends Model
     ];
 
     /**
+     * Get the table associated with the model.
+     */
+    public function getTable(): string
+    {
+        return Config::get('comments.table_names.reactions', parent::getTable());
+    }
+
+    /**
      * The comment this reaction belongs to.
      *
      * @return BelongsTo<Comment, $this>
@@ -35,7 +44,7 @@ class CommentReaction extends Model
     public function comment(): BelongsTo
     {
         /** @var class-string<Comment> $model */
-        $model = config('comments.model');
+        $model = Config::get('comments.model');
 
         return $this->belongsTo($model);
     }

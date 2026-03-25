@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 
 /**
  * @property int|string $id
@@ -62,7 +63,17 @@ class Comment extends Model
     ];
 
     /**
+     * Get the table associated with the model.
+     */
+    public function getTable(): string
+    {
+        return Config::get('comments.table_names.comments', parent::getTable());
+    }
+
+    /**
      * The event map for the model.
+     *
+     * Only dispatches events when enabled in config.
      *
      * @var array<string, class-string>
      */
@@ -71,6 +82,24 @@ class Comment extends Model
         'updated' => CommentUpdated::class,
         'deleted' => CommentDeleted::class,
     ];
+
+    /**
+     * Fire the given event for the model.
+     *
+     * Skips event dispatching when events are disabled in config.
+     *
+     * @param  string  $event
+     * @param  bool  $halt
+     * @return mixed
+     */
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if (! Config::get('comments.events.enabled', true)) {
+            return true;
+        }
+
+        return parent::fireModelEvent($event, $halt);
+    }
 
     /**
      * The user who posted the comment.
@@ -100,7 +129,7 @@ class Comment extends Model
     public function children(): HasMany
     {
         /** @var class-string<Comment> $commentModel */
-        $commentModel = config('comments.model');
+        $commentModel = Config::get('comments.model');
 
         return $this->hasMany(
             related: $commentModel,
@@ -117,7 +146,7 @@ class Comment extends Model
     public function parent(): BelongsTo
     {
         /** @var class-string<Comment> $commentModel */
-        $commentModel = config('comments.model');
+        $commentModel = Config::get('comments.model');
 
         return $this->belongsTo(
             related: $commentModel,
@@ -127,12 +156,22 @@ class Comment extends Model
     }
 
     /**
-     * Returns the Gravatar URL for the comment author.
+     * Returns the avatar URL for the comment author.
      *
-     * Falls back to the "mystery person" avatar (d=mp) when no email is found.
+     * Uses the provider configured in config/comments.php (default: gravatar).
+     * Returns an empty string when the provider is disabled (null).
      */
-    public function getAvatarUrl(int $size = 64): string
+    public function getAvatarUrl(?int $size = null): string
     {
+        $provider = Config::get('comments.avatar.provider', 'gravatar');
+
+        if ($provider === null) {
+            return '';
+        }
+
+        $size ??= (int) Config::get('comments.avatar.size', 64);
+        $default = Config::get('comments.avatar.default', 'mp');
+
         $email = '';
         $commenter = $this->commenter;
 
@@ -145,7 +184,7 @@ class Comment extends Model
 
         $hash = md5(strtolower(trim($email)));
 
-        return "https://www.gravatar.com/avatar/{$hash}.jpg?s={$size}&d=mp";
+        return "https://www.gravatar.com/avatar/{$hash}.jpg?s={$size}&d={$default}";
     }
 
     /**
@@ -180,7 +219,7 @@ class Comment extends Model
     public function reactions(): HasMany
     {
         /** @var class-string<CommentReaction> $reactionModel */
-        $reactionModel = config('comments.reaction_model', CommentReaction::class);
+        $reactionModel = Config::get('comments.reaction_model', CommentReaction::class);
 
         return $this->hasMany($reactionModel);
     }
