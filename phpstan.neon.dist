@@ -7,8 +7,8 @@ parameters:
     paths:
         - src/
         - config/
-        - migrations/
-        - tests/TestSetup/Models/
+        - database/migrations/
+        - tests/Support/Models/
 
     tips:
         treatPhpDocTypesAsCertain: false

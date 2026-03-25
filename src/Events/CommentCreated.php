@@ -2,7 +2,7 @@
 
 namespace Anil\Comments\Events;
 
-use Anil\Comments\Comment;
+use Anil\Comments\Models\Comment;
 use Illuminate\Queue\SerializesModels;
 
 class CommentCreated

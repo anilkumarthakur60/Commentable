@@ -1,6 +1,15 @@
 {
     "name": "anil/comments",
-    "description": "A Laravel package providing a full-featured, multi-UI-framework commenting system for any Eloquent model.",
+    "description": "A Laravel package providing a full-featured, framework-agnostic commenting system for any Eloquent model.",
+    "keywords": [
+        "laravel",
+        "comments",
+        "commenting",
+        "threaded-comments",
+        "reactions",
+        "polymorphic",
+        "eloquent"
+    ],
     "type": "library",
     "license": "MIT",
     "require": {
@@ -15,9 +24,9 @@
         "spatie/laravel-honeypot": "^4.0"
     },
     "require-dev": {
+        "larastan/larastan": "^3.0|^4.0",
         "laravel/pint": "^1.22",
         "orchestra/testbench": "^9.0|^10.0|^11.0",
-        "larastan/larastan": "^3.0|^4.0",
         "pestphp/pest": "^2.0|^3.0|^4.0"
     },
     "autoload": {
@@ -27,13 +36,14 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Anil\\Comments\\Tests\\": "tests"
+            "Anil\\Comments\\Tests\\": "tests/"
         }
     },
     "authors": [
         {
             "name": "Anil",
-            "email": "anilkumarthakur60@gmail.com"
+            "email": "anilkumarthakur60@gmail.com",
+            "role": "Developer"
         }
     ],
     "extra": {
@@ -53,10 +63,17 @@
         }
     },
     "scripts": {
-        "pest": "vendor/bin/pest --parallel",
-        "pest-coverage": "vendor/bin/pest --coverage",
-        "pest-type": "vendor/bin/pest --type-coverage",
-        "pint": "vendor/bin/pint",
-        "phpstan": "vendor/bin/phpstan analyse --configuration=phpstan.neon.dist"
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage",
+        "test:types": "vendor/bin/pest --type-coverage",
+        "lint": "vendor/bin/pint",
+        "lint:check": "vendor/bin/pint --test",
+        "analyse": "vendor/bin/phpstan analyse --configuration=phpstan.neon.dist",
+        "analyse:memory": "vendor/bin/phpstan analyse --configuration=phpstan.neon.dist --memory-limit=512M",
+        "ci": [
+            "@lint:check",
+            "@analyse",
+            "@test"
+        ]
     }
 }
